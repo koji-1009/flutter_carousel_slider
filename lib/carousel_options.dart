@@ -71,9 +71,6 @@ class CarouselOptions {
   /// Defaults to [Axis.horizontal].
   final Axis scrollDirection;
 
-  /// Called whenever the page in the center of the viewport changes.
-  final Function(int index, CarouselPageChangedReason reason)? onPageChanged;
-
   /// Called whenever the carousel is scrolled
   final ValueChanged<double?>? onScrolled;
 
@@ -111,7 +108,7 @@ class CarouselOptions {
   /// in the last item.
   final bool pauseAutoPlayInFiniteScroll;
 
-  /// Pass a `PageStoragekey` if you want to keep the pageview's position when it was recreated.
+  /// Pass a `PageStorageKey` if you want to keep the pageview's position when it was recreated.
   final PageStorageKey? pageViewKey;
 
   /// Use [enlargeStrategy] to determine which method to enlarge the center page.
@@ -146,7 +143,6 @@ class CarouselOptions {
     this.autoPlayAnimationDuration = const Duration(milliseconds: 800),
     this.autoPlayCurve = Curves.fastOutSlowIn,
     this.enlargeCenterPage = false,
-    this.onPageChanged,
     this.onScrolled,
     this.scrollPhysics,
     this.pageSnapping = true,
@@ -176,7 +172,6 @@ class CarouselOptions {
     Duration? autoPlayAnimationDuration,
     Curve? autoPlayCurve,
     bool? enlargeCenterPage,
-    Function(int index, CarouselPageChangedReason reason)? onPageChanged,
     ValueChanged<double?>? onScrolled,
     ScrollPhysics? scrollPhysics,
     bool? pageSnapping,
@@ -204,7 +199,6 @@ class CarouselOptions {
             autoPlayAnimationDuration ?? this.autoPlayAnimationDuration,
         autoPlayCurve: autoPlayCurve ?? this.autoPlayCurve,
         enlargeCenterPage: enlargeCenterPage ?? this.enlargeCenterPage,
-        onPageChanged: onPageChanged ?? this.onPageChanged,
         onScrolled: onScrolled ?? this.onScrolled,
         scrollPhysics: scrollPhysics ?? this.scrollPhysics,
         pageSnapping: pageSnapping ?? this.pageSnapping,
