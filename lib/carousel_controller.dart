@@ -7,7 +7,7 @@ import 'carousel_state.dart';
 import 'utils.dart';
 
 class CarouselController {
-  final Completer<Null> _readyCompleter = Completer<Null>();
+  final Completer<void> _readyCompleter = Completer<void>();
 
   CarouselState? _state;
 
@@ -23,7 +23,7 @@ class CarouselController {
 
   bool get ready => _state != null;
 
-  Future<Null> get onReady => _readyCompleter.future;
+  Future<void> get onReady => _readyCompleter.future;
 
   /// Animates the controlled [CarouselSlider] to the next page.
   ///
