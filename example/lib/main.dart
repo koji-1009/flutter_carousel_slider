@@ -303,7 +303,8 @@ class _ManuallyControlledSliderState extends State<ManuallyControlledSlider> {
           children: <Widget>[
             CarouselSlider(
               items: imageSliders,
-              options: const CarouselOptions(enlargeCenterPage: true, height: 200),
+              options:
+                  const CarouselOptions(enlargeCenterPage: true, height: 200),
               carouselController: _controller,
             ),
             Row(
@@ -470,16 +471,16 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
             child: CarouselSlider(
               items: imageSliders,
               carouselController: _controller,
-              options: CarouselOptions(
+              options: const CarouselOptions(
                 autoPlay: true,
                 enlargeCenterPage: true,
                 aspectRatio: 2.0,
-                onPageChanged: (index, reason) {
-                  setState(() {
-                    _current = index;
-                  });
-                },
               ),
+              onPageChanged: (index, reason) {
+                setState(() {
+                  _current = index;
+                });
+              },
             ),
           ),
           Row(
@@ -591,12 +592,12 @@ class _CarouselChangeReasonDemoState extends State<CarouselChangeReasonDemo> {
           Expanded(
             child: CarouselSlider(
               items: imageSliders,
-              options: CarouselOptions(
+              options: const CarouselOptions(
                 enlargeCenterPage: true,
                 aspectRatio: 16 / 9,
-                onPageChanged: onPageChange,
                 autoPlay: true,
               ),
+              onPageChanged: onPageChange,
               carouselController: _controller,
             ),
           ),

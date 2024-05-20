@@ -38,11 +38,15 @@ class CarouselSlider extends StatefulWidget {
 
   final int? itemCount;
 
+  /// Called whenever the page in the center of the viewport changes.
+  final Function(int index, CarouselPageChangedReason reason)? onPageChanged;
+
   CarouselSlider({
     required this.items,
     required this.options,
     this.disableGesture,
     CarouselController? carouselController,
+    this.onPageChanged,
     super.key,
   })  : itemBuilder = null,
         itemCount = items != null ? items.length : 0,
@@ -54,6 +58,7 @@ class CarouselSlider extends StatefulWidget {
     required this.itemBuilder,
     required this.options,
     this.disableGesture,
+    this.onPageChanged,
     CarouselController? carouselController,
     super.key,
   })  : items = null,
@@ -311,14 +316,13 @@ class _CarouselSliderState extends State<CarouselSlider>
             widget.options.enableInfiniteScroll ? null : widget.itemCount,
         key: widget.options.pageViewKey,
         onPageChanged: (int index) {
-          int currentPage = getRealIndex(
+          final currentPage = getRealIndex(
             index + carouselState!.initialPage,
             carouselState!.realPage,
             widget.itemCount,
           );
-          if (widget.options.onPageChanged != null) {
-            widget.options.onPageChanged!(currentPage, mode);
-          }
+
+          widget.onPageChanged?.call(currentPage, mode);
         },
         itemBuilder: (BuildContext context, int idx) {
           final int index = getRealIndex(
