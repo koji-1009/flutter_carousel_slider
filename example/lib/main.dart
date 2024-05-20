@@ -7,14 +7,16 @@ final List<String> imgList = [
   'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=94a1e718d89ca60a6337a6008341ca50&auto=format&fit=crop&w=1950&q=80',
   'https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=89719a0d55dd05e2deae4120227e6efc&auto=format&fit=crop&w=1953&q=80',
   'https://images.unsplash.com/photo-1508704019882-f9cf40e475b4?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8c6e5e3aba713b17aa1fe71ab4f0ae5b&auto=format&fit=crop&w=1352&q=80',
-  'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80'
+  'https://images.unsplash.com/photo-1519985176271-adb1088fa94c?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=a0c8d632e977f94e5d312d9893258f59&auto=format&fit=crop&w=1355&q=80',
 ];
 
-void main() => runApp(CarouselDemo());
+void main() => runApp(const CarouselDemo());
 
 final themeMode = ValueNotifier(2);
 
 class CarouselDemo extends StatelessWidget {
+  const CarouselDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -22,26 +24,26 @@ class CarouselDemo extends StatelessWidget {
         return MaterialApp(
           initialRoute: '/',
           darkTheme: ThemeData.dark(),
-          themeMode: ThemeMode.values.toList()[value as int],
+          themeMode: ThemeMode.values.toList()[value],
           debugShowCheckedModeBanner: false,
           routes: {
-            '/': (ctx) => CarouselDemoHome(),
-            '/basic': (ctx) => BasicDemo(),
-            '/nocenter': (ctx) => NoCenterDemo(),
-            '/image': (ctx) => ImageSliderDemo(),
-            '/complicated': (ctx) => ComplicatedImageDemo(),
-            '/enlarge': (ctx) => EnlargeStrategyDemo(),
-            '/manual': (ctx) => ManuallyControlledSlider(),
-            '/noloop': (ctx) => NoonLoopingDemo(),
-            '/vertical': (ctx) => VerticalSliderDemo(),
-            '/fullscreen': (ctx) => FullscreenSliderDemo(),
-            '/ondemand': (ctx) => OnDemandCarouselDemo(),
-            '/indicator': (ctx) => CarouselWithIndicatorDemo(),
-            '/prefetch': (ctx) => PrefetchImageDemo(),
-            '/reason': (ctx) => CarouselChangeReasonDemo(),
-            '/position': (ctx) => KeepPageviewPositionDemo(),
-            '/multiple': (ctx) => MultipleItemDemo(),
-            '/zoom': (ctx) => EnlargeStrategyZoomDemo(),
+            '/': (ctx) => const CarouselDemoHome(),
+            '/basic': (ctx) => const BasicDemo(),
+            '/nocenter': (ctx) => const NoCenterDemo(),
+            '/image': (ctx) => const ImageSliderDemo(),
+            '/complicated': (ctx) => const ComplicatedImageDemo(),
+            '/enlarge': (ctx) => const EnlargeStrategyDemo(),
+            '/manual': (ctx) => const ManuallyControlledSlider(),
+            '/noloop': (ctx) => const NoonLoopingDemo(),
+            '/vertical': (ctx) => const VerticalSliderDemo(),
+            '/fullscreen': (ctx) => const FullscreenSliderDemo(),
+            '/ondemand': (ctx) => const OnDemandCarouselDemo(),
+            '/indicator': (ctx) => const CarouselWithIndicatorDemo(),
+            '/prefetch': (ctx) => const PrefetchImageDemo(),
+            '/reason': (ctx) => const CarouselChangeReasonDemo(),
+            '/position': (ctx) => const KeepPageViewPositionDemo(),
+            '/multiple': (ctx) => const MultipleItemDemo(),
+            '/zoom': (ctx) => const EnlargeStrategyZoomDemo(),
           },
         );
       },
@@ -51,9 +53,10 @@ class CarouselDemo extends StatelessWidget {
 }
 
 class DemoItem extends StatelessWidget {
+  const DemoItem(this.title, this.route, {super.key});
+
   final String title;
   final String route;
-  DemoItem(this.title, this.route);
 
   @override
   Widget build(BuildContext context) {
@@ -67,21 +70,24 @@ class DemoItem extends StatelessWidget {
 }
 
 class CarouselDemoHome extends StatelessWidget {
+  const CarouselDemoHome({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Carousel demo'),
+        title: const Text('Carousel demo'),
         actions: [
           IconButton(
-              icon: Icon(Icons.nightlight_round),
-              onPressed: () {
-                themeMode.value = themeMode.value == 1 ? 2 : 1;
-              })
+            icon: const Icon(Icons.nightlight_round),
+            onPressed: () {
+              themeMode.value = themeMode.value == 1 ? 2 : 1;
+            },
+          ),
         ],
       ),
       body: ListView(
-        children: <Widget>[
+        children: const <Widget>[
           DemoItem('Basic demo', '/basic'),
           DemoItem('No center mode demo', '/nocenter'),
           DemoItem('Image carousel slider', '/image'),
@@ -105,214 +111,244 @@ class CarouselDemoHome extends StatelessWidget {
 }
 
 class BasicDemo extends StatelessWidget {
+  const BasicDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
-    List<int> list = [1, 2, 3, 4, 5];
+    const list = [1, 2, 3, 4, 5];
     return Scaffold(
-      appBar: AppBar(title: Text('Basic demo')),
-      body: Container(
-          child: CarouselSlider(
-        options: CarouselOptions(),
+      appBar: AppBar(
+        title: const Text('Basic demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(),
         items: list
-            .map((item) => Container(
-                  child: Center(child: Text(item.toString())),
-                  color: Colors.green,
-                ))
+            .map(
+              (item) => Container(
+                color: Colors.green,
+                child: Center(
+                  child: Text(
+                    item.toString(),
+                  ),
+                ),
+              ),
+            )
             .toList(),
-      )),
+      ),
     );
   }
 }
 
 class NoCenterDemo extends StatelessWidget {
+  const NoCenterDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
-    List<int> list = [1, 2, 3, 4, 5];
+    const list = [1, 2, 3, 4, 5];
     return Scaffold(
-      appBar: AppBar(title: Text('Basic demo')),
-      body: Container(
-          child: CarouselSlider(
-        options: CarouselOptions(
+      appBar: AppBar(
+        title: const Text('Basic demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(
           disableCenter: true,
         ),
         items: list
-            .map((item) => Container(
-                  child: Text(item.toString()),
-                  color: Colors.green,
-                ))
+            .map(
+              (item) => Container(
+                color: Colors.green,
+                child: Text(
+                  item.toString(),
+                ),
+              ),
+            )
             .toList(),
-      )),
+      ),
     );
   }
 }
 
 class ImageSliderDemo extends StatelessWidget {
+  const ImageSliderDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Image slider demo')),
-      body: Container(
-          child: CarouselSlider(
-        options: CarouselOptions(),
+      appBar: AppBar(
+        title: const Text('Image slider demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(),
         items: imgList
-            .map((item) => Container(
-                  child: Center(
-                      child:
-                          Image.network(item, fit: BoxFit.cover, width: 1000)),
-                ))
+            .map(
+              (item) => Center(
+                child: Image.network(item, fit: BoxFit.cover, width: 1000),
+              ),
+            )
             .toList(),
-      )),
+      ),
     );
   }
 }
 
 final List<Widget> imageSliders = imgList
-    .map((item) => Container(
-          child: Container(
-            margin: EdgeInsets.all(5.0),
-            child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                child: Stack(
-                  children: <Widget>[
-                    Image.network(item, fit: BoxFit.cover, width: 1000.0),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(200, 0, 0, 0),
-                              Color.fromARGB(0, 0, 0, 0)
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 20.0),
-                        child: Text(
-                          'No. ${imgList.indexOf(item)} image',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
+    .map(
+      (item) => Container(
+        margin: const EdgeInsets.all(5.0),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.all(
+            Radius.circular(5.0),
           ),
-        ))
+          child: Stack(
+            children: <Widget>[
+              Image.network(item, fit: BoxFit.cover, width: 1000.0),
+              Positioned(
+                bottom: 0.0,
+                left: 0.0,
+                right: 0.0,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color.fromARGB(200, 0, 0, 0),
+                        Color.fromARGB(0, 0, 0, 0),
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 20.0,
+                  ),
+                  child: Text(
+                    'No. ${imgList.indexOf(item)} image',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    )
     .toList();
 
 class ComplicatedImageDemo extends StatelessWidget {
+  const ComplicatedImageDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Complicated image slider demo')),
-      body: Container(
-        child: CarouselSlider(
-          options: CarouselOptions(
-            autoPlay: true,
-            aspectRatio: 2.0,
-            enlargeCenterPage: true,
-          ),
-          items: imageSliders,
+      appBar: AppBar(
+        title: const Text('Complicated image slider demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(
+          autoPlay: true,
+          aspectRatio: 2.0,
+          enlargeCenterPage: true,
         ),
+        items: imageSliders,
       ),
     );
   }
 }
 
 class EnlargeStrategyDemo extends StatelessWidget {
+  const EnlargeStrategyDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Complicated image slider demo')),
-      body: Container(
-        child: CarouselSlider(
-          options: CarouselOptions(
-            autoPlay: true,
-            aspectRatio: 2.0,
-            enlargeCenterPage: true,
-            enlargeStrategy: CenterPageEnlargeStrategy.height,
-          ),
-          items: imageSliders,
+      appBar: AppBar(
+        title: const Text('Complicated image slider demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(
+          autoPlay: true,
+          aspectRatio: 2.0,
+          enlargeCenterPage: true,
+          enlargeStrategy: CenterPageEnlargeStrategy.height,
         ),
+        items: imageSliders,
       ),
     );
   }
 }
 
 class ManuallyControlledSlider extends StatefulWidget {
+  const ManuallyControlledSlider({super.key});
+
   @override
-  State<StatefulWidget> createState() {
-    return _ManuallyControlledSliderState();
-  }
+  State<ManuallyControlledSlider> createState() =>
+      _ManuallyControlledSliderState();
 }
 
 class _ManuallyControlledSliderState extends State<ManuallyControlledSlider> {
   final CarouselController _controller = CarouselController();
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Manually controlled slider')),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              CarouselSlider(
-                items: imageSliders,
-                options: CarouselOptions(enlargeCenterPage: true, height: 200),
-                carouselController: _controller,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Flexible(
+      appBar: AppBar(
+        title: const Text('Manually controlled slider'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            CarouselSlider(
+              items: imageSliders,
+              options: const CarouselOptions(enlargeCenterPage: true, height: 200),
+              carouselController: _controller,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flexible(
+                  child: ElevatedButton(
+                    onPressed: () => _controller.previousPage(),
+                    child: const Text('←'),
+                  ),
+                ),
+                Flexible(
+                  child: ElevatedButton(
+                    onPressed: () => _controller.nextPage(),
+                    child: const Text('→'),
+                  ),
+                ),
+                ...Iterable<int>.generate(imgList.length).map(
+                  (int pageIndex) => Flexible(
                     child: ElevatedButton(
-                      onPressed: () => _controller.previousPage(),
-                      child: Text('←'),
+                      onPressed: () => _controller.animateToPage(pageIndex),
+                      child: Text("$pageIndex"),
                     ),
                   ),
-                  Flexible(
-                    child: ElevatedButton(
-                      onPressed: () => _controller.nextPage(),
-                      child: Text('→'),
-                    ),
-                  ),
-                  ...Iterable<int>.generate(imgList.length).map(
-                    (int pageIndex) => Flexible(
-                      child: ElevatedButton(
-                        onPressed: () => _controller.animateToPage(pageIndex),
-                        child: Text("$pageIndex"),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
-        ));
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
 class NoonLoopingDemo extends StatelessWidget {
+  const NoonLoopingDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Noon-looping carousel demo')),
-      body: Container(
-          child: CarouselSlider(
-        options: CarouselOptions(
+      appBar: AppBar(
+        title: const Text('Noon-looping carousel demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: true,
           enableInfiniteScroll: false,
@@ -320,35 +356,42 @@ class NoonLoopingDemo extends StatelessWidget {
           autoPlay: true,
         ),
         items: imageSliders,
-      )),
+      ),
     );
   }
 }
 
 class VerticalSliderDemo extends StatelessWidget {
+  const VerticalSliderDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Vertical sliding carousel demo')),
-      body: Container(
-          child: CarouselSlider(
-        options: CarouselOptions(
+      appBar: AppBar(
+        title: const Text('Vertical sliding carousel demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: true,
           scrollDirection: Axis.vertical,
           autoPlay: true,
         ),
         items: imageSliders,
-      )),
+      ),
     );
   }
 }
 
 class FullscreenSliderDemo extends StatelessWidget {
+  const FullscreenSliderDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Fullscreen sliding carousel demo')),
+      appBar: AppBar(
+        title: const Text('Fullscreen sliding carousel demo'),
+      ),
       body: Builder(
         builder: (context) {
           final double height = MediaQuery.of(context).size.height;
@@ -360,14 +403,15 @@ class FullscreenSliderDemo extends StatelessWidget {
               // autoPlay: false,
             ),
             items: imgList
-                .map((item) => Container(
-                      child: Center(
-                          child: Image.network(
-                        item,
-                        fit: BoxFit.cover,
-                        height: height,
-                      )),
-                    ))
+                .map(
+                  (item) => Center(
+                    child: Image.network(
+                      item,
+                      fit: BoxFit.cover,
+                      height: height,
+                    ),
+                  ),
+                )
                 .toList(),
           );
         },
@@ -377,33 +421,37 @@ class FullscreenSliderDemo extends StatelessWidget {
 }
 
 class OnDemandCarouselDemo extends StatelessWidget {
+  const OnDemandCarouselDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('On-demand carousel demo')),
-      body: Container(
-          child: CarouselSlider.builder(
+      appBar: AppBar(
+        title: const Text('On-demand carousel demo'),
+      ),
+      body: CarouselSlider.builder(
         itemCount: 100,
-        options: CarouselOptions(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: true,
           autoPlay: true,
         ),
         itemBuilder: (ctx, index, realIdx) {
-          return Container(
-            child: Text(index.toString()),
+          return Text(
+            index.toString(),
           );
         },
-      )),
+      ),
     );
   }
 }
 
 class CarouselWithIndicatorDemo extends StatefulWidget {
+  const CarouselWithIndicatorDemo({super.key});
+
   @override
-  State<StatefulWidget> createState() {
-    return _CarouselWithIndicatorState();
-  }
+  State<CarouselWithIndicatorDemo> createState() =>
+      _CarouselWithIndicatorState();
 }
 
 class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
@@ -413,13 +461,16 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Carousel with indicator controller demo')),
-      body: Column(children: [
-        Expanded(
-          child: CarouselSlider(
-            items: imageSliders,
-            carouselController: _controller,
-            options: CarouselOptions(
+      appBar: AppBar(
+        title: const Text('Carousel with indicator controller demo'),
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: CarouselSlider(
+              items: imageSliders,
+              carouselController: _controller,
+              options: CarouselOptions(
                 autoPlay: true,
                 enlargeCenterPage: true,
                 aspectRatio: 2.0,
@@ -427,38 +478,44 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
                   setState(() {
                     _current = index;
                   });
-                }),
+                },
+              ),
+            ),
           ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: imgList.asMap().entries.map((entry) {
-            return GestureDetector(
-              onTap: () => _controller.animateToPage(entry.key),
-              child: Container(
-                width: 12.0,
-                height: 12.0,
-                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                decoration: BoxDecoration(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: imgList.asMap().entries.map((entry) {
+              return GestureDetector(
+                onTap: () => _controller.animateToPage(entry.key),
+                child: Container(
+                  width: 12.0,
+                  height: 12.0,
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 8.0,
+                    horizontal: 4.0,
+                  ),
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: (Theme.of(context).brightness == Brightness.dark
                             ? Colors.white
                             : Colors.black)
-                        .withOpacity(_current == entry.key ? 0.9 : 0.4)),
-              ),
-            );
-          }).toList(),
-        ),
-      ]),
+                        .withOpacity(_current == entry.key ? 0.9 : 0.4),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class PrefetchImageDemo extends StatefulWidget {
+  const PrefetchImageDemo({super.key});
+
   @override
-  State<StatefulWidget> createState() {
-    return _PrefetchImageDemoState();
-  }
+  State<PrefetchImageDemo> createState() => _PrefetchImageDemoState();
 }
 
 class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
@@ -474,43 +531,43 @@ class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      images.forEach((imageUrl) {
-        precacheImage(NetworkImage(imageUrl), context);
-      });
-    });
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      for (var imageUrl in images) {
+        precacheImage(NetworkImage(imageUrl), context);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Prefetch image slider demo')),
-      body: Container(
-          child: CarouselSlider.builder(
+      appBar: AppBar(
+        title: const Text('Prefetch image slider demo'),
+      ),
+      body: CarouselSlider.builder(
         itemCount: images.length,
-        options: CarouselOptions(
+        options: const CarouselOptions(
           autoPlay: true,
           aspectRatio: 2.0,
           enlargeCenterPage: true,
         ),
         itemBuilder: (context, index, realIdx) {
-          return Container(
-            child: Center(
-                child: Image.network(images[index],
-                    fit: BoxFit.cover, width: 1000)),
+          return Center(
+            child: Image.network(images[index], fit: BoxFit.cover, width: 1000),
           );
         },
-      )),
+      ),
     );
   }
 }
 
 class CarouselChangeReasonDemo extends StatefulWidget {
+  const CarouselChangeReasonDemo({super.key});
+
   @override
-  State<StatefulWidget> createState() {
-    return _CarouselChangeReasonDemoState();
-  }
+  State<CarouselChangeReasonDemo> createState() =>
+      _CarouselChangeReasonDemoState();
 }
 
 class _CarouselChangeReasonDemoState extends State<CarouselChangeReasonDemo> {
@@ -526,138 +583,151 @@ class _CarouselChangeReasonDemoState extends State<CarouselChangeReasonDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('Change reason demo')),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: CarouselSlider(
-                items: imageSliders,
-                options: CarouselOptions(
-                  enlargeCenterPage: true,
-                  aspectRatio: 16 / 9,
-                  onPageChanged: onPageChange,
-                  autoPlay: true,
-                ),
-                carouselController: _controller,
+      appBar: AppBar(
+        title: const Text('Change reason demo'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: CarouselSlider(
+              items: imageSliders,
+              options: CarouselOptions(
+                enlargeCenterPage: true,
+                aspectRatio: 16 / 9,
+                onPageChanged: onPageChange,
+                autoPlay: true,
               ),
+              carouselController: _controller,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flexible(
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () => _controller.previousPage(),
+                  child: const Text('←'),
+                ),
+              ),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: () => _controller.nextPage(),
+                  child: const Text('→'),
+                ),
+              ),
+              ...Iterable<int>.generate(imgList.length).map(
+                (int pageIndex) => Flexible(
                   child: ElevatedButton(
-                    onPressed: () => _controller.previousPage(),
-                    child: Text('←'),
+                    onPressed: () => _controller.animateToPage(pageIndex),
+                    child: Text("$pageIndex"),
                   ),
                 ),
-                Flexible(
-                  child: ElevatedButton(
-                    onPressed: () => _controller.nextPage(),
-                    child: Text('→'),
-                  ),
-                ),
-                ...Iterable<int>.generate(imgList.length).map(
-                  (int pageIndex) => Flexible(
-                    child: ElevatedButton(
-                      onPressed: () => _controller.animateToPage(pageIndex),
-                      child: Text("$pageIndex"),
-                    ),
-                  ),
-                ),
+              ),
+            ],
+          ),
+          Center(
+            child: Column(
+              children: [
+                const Text('page change reason: '),
+                Text(reason),
               ],
             ),
-            Center(
-              child: Column(
-                children: [
-                  Text('page change reason: '),
-                  Text(reason),
-                ],
-              ),
-            )
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }
 
-class KeepPageviewPositionDemo extends StatelessWidget {
+class KeepPageViewPositionDemo extends StatelessWidget {
+  const KeepPageViewPositionDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Keep pageview position demo')),
-      body: ListView.builder(itemBuilder: (ctx, index) {
-        if (index == 3) {
-          return Container(
-              child: CarouselSlider(
-            options: CarouselOptions(
-              aspectRatio: 2.0,
-              enlargeCenterPage: true,
-              pageViewKey: PageStorageKey<String>('carousel_slider'),
-            ),
-            items: imageSliders,
-          ));
-        } else {
-          return Container(
-            margin: EdgeInsets.symmetric(vertical: 20),
-            color: Colors.blue,
-            height: 200,
-            child: Center(
-              child: Text('other content'),
-            ),
-          );
-        }
-      }),
+      appBar: AppBar(
+        title: const Text('Keep pageview position demo'),
+      ),
+      body: ListView.builder(
+        itemBuilder: (ctx, index) {
+          if (index == 3) {
+            return CarouselSlider(
+              options: const CarouselOptions(
+                aspectRatio: 2.0,
+                enlargeCenterPage: true,
+                pageViewKey: PageStorageKey<String>('carousel_slider'),
+              ),
+              items: imageSliders,
+            );
+          } else {
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 20),
+              color: Colors.blue,
+              height: 200,
+              child: const Center(
+                child: Text('other content'),
+              ),
+            );
+          }
+        },
+      ),
     );
   }
 }
 
 class MultipleItemDemo extends StatelessWidget {
+  const MultipleItemDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Multiple item in one slide demo')),
-      body: Container(
-          child: CarouselSlider.builder(
-        options: CarouselOptions(
+      appBar: AppBar(
+        title: const Text('Multiple item in one slide demo'),
+      ),
+      body: CarouselSlider.builder(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: false,
           viewportFraction: 1,
         ),
         itemCount: (imgList.length / 2).round(),
         itemBuilder: (context, index, realIdx) {
-          final int first = index * 2;
-          final int second = first + 1;
+          final first = index * 2;
+          final second = first + 1;
           return Row(
             children: [first, second].map((idx) {
               return Expanded(
                 flex: 1,
                 child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10),
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
                   child: Image.network(imgList[idx], fit: BoxFit.cover),
                 ),
               );
             }).toList(),
           );
         },
-      )),
+      ),
     );
   }
 }
 
 class EnlargeStrategyZoomDemo extends StatelessWidget {
+  const EnlargeStrategyZoomDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('enlarge strategy: zoom demo')),
-      body: Container(
-        child: CarouselSlider(
-          options: CarouselOptions(
-            aspectRatio: 2.0,
-            enlargeCenterPage: true,
-            enlargeStrategy: CenterPageEnlargeStrategy.zoom,
-            enlargeFactor: 0.4,
-          ),
-          items: imageSliders,
+      appBar: AppBar(
+        title: const Text('enlarge strategy: zoom demo'),
+      ),
+      body: CarouselSlider(
+        options: const CarouselOptions(
+          aspectRatio: 2.0,
+          enlargeCenterPage: true,
+          enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+          enlargeFactor: 0.4,
         ),
+        items: imageSliders,
       ),
     );
   }
