@@ -5,7 +5,8 @@ repository: https://github.com/serenader2014/flutter_carousel_slider
 version: 4.2.1
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.13.0'
 
 dependencies:
   flutter:
