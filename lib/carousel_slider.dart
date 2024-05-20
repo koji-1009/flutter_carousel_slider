@@ -82,8 +82,8 @@ class _CarouselSliderState extends State<CarouselSlider>
   /// mode is related to why the page is being changed
   CarouselPageChangedReason mode = CarouselPageChangedReason.controller;
 
-  void changeMode(CarouselPageChangedReason mode) {
-    mode = mode;
+  void changeMode(CarouselPageChangedReason newMode) {
+    mode = newMode;
   }
 
   @override
