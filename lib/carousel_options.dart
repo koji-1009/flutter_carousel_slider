@@ -133,7 +133,7 @@ class CarouselOptions {
   /// Exposed clipBehavior of PageView
   final Clip clipBehavior;
 
-  CarouselOptions({
+  const CarouselOptions({
     this.height,
     this.aspectRatio = 16 / 9,
     this.viewportFraction = 0.8,

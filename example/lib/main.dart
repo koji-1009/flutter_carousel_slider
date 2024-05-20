@@ -121,7 +121,7 @@ class BasicDemo extends StatelessWidget {
         title: const Text('Basic demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(),
+        options: const CarouselOptions(),
         items: list
             .map(
               (item) => Container(
@@ -150,7 +150,7 @@ class NoCenterDemo extends StatelessWidget {
         title: const Text('Basic demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(
+        options: const CarouselOptions(
           disableCenter: true,
         ),
         items: list
@@ -178,7 +178,7 @@ class ImageSliderDemo extends StatelessWidget {
         title: const Text('Image slider demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(),
+        options: const CarouselOptions(),
         items: imgList
             .map(
               (item) => Center(
@@ -248,7 +248,7 @@ class ComplicatedImageDemo extends StatelessWidget {
         title: const Text('Complicated image slider demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(
+        options: const CarouselOptions(
           autoPlay: true,
           aspectRatio: 2.0,
           enlargeCenterPage: true,
@@ -269,7 +269,7 @@ class EnlargeStrategyDemo extends StatelessWidget {
         title: const Text('Complicated image slider demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(
+        options: const CarouselOptions(
           autoPlay: true,
           aspectRatio: 2.0,
           enlargeCenterPage: true,
@@ -303,7 +303,7 @@ class _ManuallyControlledSliderState extends State<ManuallyControlledSlider> {
           children: <Widget>[
             CarouselSlider(
               items: imageSliders,
-              options: CarouselOptions(enlargeCenterPage: true, height: 200),
+              options: const CarouselOptions(enlargeCenterPage: true, height: 200),
               carouselController: _controller,
             ),
             Row(
@@ -348,7 +348,7 @@ class NoonLoopingDemo extends StatelessWidget {
         title: const Text('Noon-looping carousel demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: true,
           enableInfiniteScroll: false,
@@ -371,7 +371,7 @@ class VerticalSliderDemo extends StatelessWidget {
         title: const Text('Vertical sliding carousel demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: true,
           scrollDirection: Axis.vertical,
@@ -431,7 +431,7 @@ class OnDemandCarouselDemo extends StatelessWidget {
       ),
       body: CarouselSlider.builder(
         itemCount: 100,
-        options: CarouselOptions(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: true,
           autoPlay: true,
@@ -547,7 +547,7 @@ class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
       ),
       body: CarouselSlider.builder(
         itemCount: images.length,
-        options: CarouselOptions(
+        options: const CarouselOptions(
           autoPlay: true,
           aspectRatio: 2.0,
           enlargeCenterPage: true,
@@ -652,10 +652,10 @@ class KeepPageViewPositionDemo extends StatelessWidget {
         itemBuilder: (ctx, index) {
           if (index == 3) {
             return CarouselSlider(
-              options: CarouselOptions(
+              options: const CarouselOptions(
                 aspectRatio: 2.0,
                 enlargeCenterPage: true,
-                pageViewKey: const PageStorageKey<String>('carousel_slider'),
+                pageViewKey: PageStorageKey<String>('carousel_slider'),
               ),
               items: imageSliders,
             );
@@ -685,7 +685,7 @@ class MultipleItemDemo extends StatelessWidget {
         title: const Text('Multiple item in one slide demo'),
       ),
       body: CarouselSlider.builder(
-        options: CarouselOptions(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: false,
           viewportFraction: 1,
@@ -721,7 +721,7 @@ class EnlargeStrategyZoomDemo extends StatelessWidget {
         title: const Text('enlarge strategy: zoom demo'),
       ),
       body: CarouselSlider(
-        options: CarouselOptions(
+        options: const CarouselOptions(
           aspectRatio: 2.0,
           enlargeCenterPage: true,
           enlargeStrategy: CenterPageEnlargeStrategy.zoom,
