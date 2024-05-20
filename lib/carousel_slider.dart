@@ -60,10 +60,10 @@ class CarouselSlider extends StatefulWidget {
         _carouselController = carouselController ?? CarouselController();
 
   @override
-  CarouselSliderState createState() => CarouselSliderState();
+  State<CarouselSlider> createState() => _CarouselSliderState();
 }
 
-class CarouselSliderState extends State<CarouselSlider>
+class _CarouselSliderState extends State<CarouselSlider>
     with TickerProviderStateMixin {
   CarouselController get carouselController => widget._carouselController;
   Timer? timer;
