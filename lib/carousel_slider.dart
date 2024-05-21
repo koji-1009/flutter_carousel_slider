@@ -317,18 +317,18 @@ class _CarouselSliderState extends State<CarouselSlider>
         key: widget.options.pageViewKey,
         onPageChanged: (int index) {
           final currentPage = getRealIndex(
-            index + carouselState!.initialPage,
-            carouselState!.realPage,
-            widget.itemCount,
+            position: index + carouselState!.initialPage,
+            base: carouselState!.realPage,
+            length: widget.itemCount,
           );
 
           widget.onPageChanged?.call(currentPage, mode);
         },
         itemBuilder: (BuildContext context, int idx) {
           final int index = getRealIndex(
-            idx + carouselState!.initialPage,
-            carouselState!.realPage,
-            widget.itemCount,
+            position: idx + carouselState!.initialPage,
+            base: carouselState!.realPage,
+            length: widget.itemCount,
           );
 
           return AnimatedBuilder(
