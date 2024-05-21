@@ -70,9 +70,9 @@ class CarouselController {
   /// without animation, and without checking if the new value is in range.
   void jumpToPage(int page) {
     final index = getRealIndex(
-      _state!.pageController!.page!.toInt(),
-      _state!.realPage - _state!.initialPage,
-      _state!.itemCount,
+      position: _state!.pageController!.page!.toInt(),
+      base: _state!.realPage - _state!.initialPage,
+      length: _state!.itemCount,
     );
 
     _setModeController();
@@ -94,9 +94,9 @@ class CarouselController {
       _state!.onResetTimer();
     }
     final index = getRealIndex(
-      _state!.pageController!.page!.toInt(),
-      _state!.realPage - _state!.initialPage,
-      _state!.itemCount,
+      position: _state!.pageController!.page!.toInt(),
+      base: _state!.realPage - _state!.initialPage,
+      length: _state!.itemCount,
     );
     int smallestMovement = page - index;
     if (_state!.options.enableInfiniteScroll &&
