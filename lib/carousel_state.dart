@@ -2,6 +2,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class CarouselState {
+  CarouselState({
+    required this.options,
+    required this.onResetTimer,
+    required this.onResumeTimer,
+    required this.changeMode,
+  });
+
   /// The [CarouselOptions] to create this state
   CarouselOptions options;
 
@@ -35,11 +42,4 @@ class CarouselState {
 
   /// The callback to set the Reason Carousel changed
   Function(CarouselPageChangedReason) changeMode;
-
-  CarouselState(
-    this.options,
-    this.onResetTimer,
-    this.onResumeTimer,
-    this.changeMode,
-  );
 }
