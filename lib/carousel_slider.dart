@@ -20,6 +20,31 @@ typedef ExtendedIndexedWidgetBuilder = Widget Function(
 );
 
 class CarouselSlider extends StatefulWidget {
+  CarouselSlider({
+    required this.items,
+    required this.options,
+    this.disableGesture,
+    CarouselController? carouselController,
+    this.onPageChanged,
+    this.onScrolled,
+    super.key,
+  })  : itemBuilder = null,
+        itemCount = items != null ? items.length : 0,
+        _carouselController = carouselController ?? CarouselController();
+
+  /// The on demand item builder constructor
+  CarouselSlider.builder({
+    required this.itemCount,
+    required this.itemBuilder,
+    required this.options,
+    this.disableGesture,
+    this.onPageChanged,
+    this.onScrolled,
+    CarouselController? carouselController,
+    super.key,
+  })  : items = null,
+        _carouselController = carouselController ?? CarouselController();
+
   /// [CarouselOptions] to create a [CarouselState] with
   final CarouselOptions options;
 
@@ -39,30 +64,11 @@ class CarouselSlider extends StatefulWidget {
   final int? itemCount;
 
   /// Called whenever the page in the center of the viewport changes.
-  final Function(int index, CarouselPageChangedReason reason)? onPageChanged;
+  final void Function(int index, CarouselPageChangedReason reason)?
+      onPageChanged;
 
-  CarouselSlider({
-    required this.items,
-    required this.options,
-    this.disableGesture,
-    CarouselController? carouselController,
-    this.onPageChanged,
-    super.key,
-  })  : itemBuilder = null,
-        itemCount = items != null ? items.length : 0,
-        _carouselController = carouselController ?? CarouselController();
-
-  /// The on demand item builder constructor
-  CarouselSlider.builder({
-    required this.itemCount,
-    required this.itemBuilder,
-    required this.options,
-    this.disableGesture,
-    this.onPageChanged,
-    CarouselController? carouselController,
-    super.key,
-  })  : items = null,
-        _carouselController = carouselController ?? CarouselController();
+  /// Called whenever the carousel is scrolled
+  final void Function(double? position)? onScrolled;
 
   @override
   State<CarouselSlider> createState() => _CarouselSliderState();
@@ -206,9 +212,7 @@ class _CarouselSliderState extends State<CarouselSlider>
     if (true == widget.disableGesture) {
       return NotificationListener<ScrollUpdateNotification>(
         onNotification: (notification) {
-          if (widget.options.onScrolled != null) {
-            widget.options.onScrolled!(_carouselState!.pageController!.page);
-          }
+          widget.onScrolled?.call(_carouselState!.pageController!.page);
           return false;
         },
         child: wrapper,
@@ -231,9 +235,7 @@ class _CarouselSliderState extends State<CarouselSlider>
       },
       child: NotificationListener<ScrollUpdateNotification>(
         onNotification: (notification) {
-          if (widget.options.onScrolled != null) {
-            widget.options.onScrolled!(_carouselState!.pageController!.page);
-          }
+          widget.onScrolled?.call(_carouselState!.pageController!.page);
           return false;
         },
         child: wrapper,
