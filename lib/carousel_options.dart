@@ -71,9 +71,6 @@ class CarouselOptions {
   /// Defaults to [Axis.horizontal].
   final Axis scrollDirection;
 
-  /// Called whenever the carousel is scrolled
-  final ValueChanged<double?>? onScrolled;
-
   /// How the carousel should respond to user input.
   ///
   /// For example, determines how the items continues to animate after the
