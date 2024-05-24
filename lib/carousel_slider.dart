@@ -105,8 +105,8 @@ class _CarouselSliderState extends State<CarouselSlider>
     );
 
     final isNeedResetTimer = widget.options.pauseAutoPlayOnManualNavigate;
-    _carouselController
-      ..setOnNextPage((duration, curve) async {
+    _carouselController.setupCallbacks(
+      onNextPage: (duration, curve) async {
         if (isNeedResetTimer) {
           _clearTimer();
         }
@@ -118,8 +118,8 @@ class _CarouselSliderState extends State<CarouselSlider>
         if (isNeedResetTimer) {
           _resumeTimer();
         }
-      })
-      ..setOnPreviousPage((duration, curve) async {
+      },
+      onPreviousPage: (duration, curve) async {
         if (isNeedResetTimer) {
           _clearTimer();
         }
@@ -131,8 +131,8 @@ class _CarouselSliderState extends State<CarouselSlider>
         if (isNeedResetTimer) {
           _resumeTimer();
         }
-      })
-      ..setOnJumpToPage((page) {
+      },
+      onJumpToPage: (page) {
         final index = getRealIndex(
           position: _pageController.page!.toInt(),
           base: widget.options.realPage - widget.options.initialPage,
@@ -143,8 +143,8 @@ class _CarouselSliderState extends State<CarouselSlider>
 
         final pageToJump = _pageController.page!.toInt() + page - index;
         _pageController.jumpToPage(pageToJump);
-      })
-      ..setOnAnimateToPage((page, duration, curve) async {
+      },
+      onAnimateToPage: (page, duration, curve) async {
         if (isNeedResetTimer) {
           _clearTimer();
         }
@@ -174,13 +174,14 @@ class _CarouselSliderState extends State<CarouselSlider>
         if (isNeedResetTimer) {
           _resumeTimer();
         }
-      })
-      ..setOnStartAutoPlay(() {
+      },
+      onStartAutoPlay: () {
         _resumeTimer();
-      })
-      ..setOnStopAutoPlay(() {
+      },
+      onStopAutoPlay: () {
         _clearTimer();
-      });
+      },
+    );
 
     _handleAutoPlay();
   }

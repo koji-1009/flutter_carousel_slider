@@ -16,20 +16,40 @@ typedef AnimateToPageCallback = Future<void> Function(
 class CarouselController {
   CarouselController();
 
-  final List<PageChangeCallback> _onNextPageCallbacks = [];
-  final List<PageChangeCallback> _onPreviousPageCallbacks = [];
-  final List<JumpToCallback> _onJumpToPageCallbacks = [];
-  final List<AnimateToPageCallback> _onAnimateToPageCallbacks = [];
-  final List<VoidCallback> _onStartAutoPlayCallbacks = [];
-  final List<VoidCallback> _onStopAutoPlayCallbacks = [];
+  PageChangeCallback? onNextPageCallback;
+  PageChangeCallback? onPreviousPageCallback;
+  JumpToCallback? onJumpToPageCallback;
+  AnimateToPageCallback? onAnimateToPageCallback;
+  VoidCallback? onStartAutoPlayCallback;
+  VoidCallback? onStopAutoPlayCallback;
 
+  /// Disposes the controller.
   void dispose() {
-    _onNextPageCallbacks.clear();
-    _onPreviousPageCallbacks.clear();
-    _onJumpToPageCallbacks.clear();
-    _onAnimateToPageCallbacks.clear();
-    _onStartAutoPlayCallbacks.clear();
-    _onStopAutoPlayCallbacks.clear();
+    onNextPageCallback = null;
+    onPreviousPageCallback = null;
+    onJumpToPageCallback = null;
+    onAnimateToPageCallback = null;
+    onStartAutoPlayCallback = null;
+    onStopAutoPlayCallback = null;
+  }
+
+  /// Sets up the callbacks for the controller.
+  /// This method is called by the [CarouselSlider] widget.
+  /// Please do not call this method from outside the package.
+  void setupCallbacks({
+    required PageChangeCallback onNextPage,
+    required PageChangeCallback onPreviousPage,
+    required JumpToCallback onJumpToPage,
+    required AnimateToPageCallback onAnimateToPage,
+    required VoidCallback onStartAutoPlay,
+    required VoidCallback onStopAutoPlay,
+  }) {
+    onNextPageCallback = onNextPage;
+    onPreviousPageCallback = onPreviousPage;
+    onJumpToPageCallback = onJumpToPage;
+    onAnimateToPageCallback = onAnimateToPage;
+    onStartAutoPlayCallback = onStartAutoPlay;
+    onStopAutoPlayCallback = onStopAutoPlay;
   }
 
   /// Animates the controlled [CarouselSlider] to the next page.
@@ -42,9 +62,7 @@ class CarouselController {
     ),
     Curve curve = Curves.linear,
   }) async {
-    for (final callback in _onNextPageCallbacks) {
-      await callback(duration, curve);
-    }
+    await onNextPageCallback?.call(duration, curve);
   }
 
   /// Animates the controlled [CarouselSlider] to the previous page.
@@ -57,9 +75,7 @@ class CarouselController {
     ),
     Curve curve = Curves.linear,
   }) async {
-    for (final callback in _onPreviousPageCallbacks) {
-      await callback(duration, curve);
-    }
+    await onPreviousPageCallback?.call(duration, curve);
   }
 
   /// Changes which page is displayed in the controlled [CarouselSlider].
@@ -67,9 +83,7 @@ class CarouselController {
   /// Jumps the page position from its current value to the given value,
   /// without animation, and without checking if the new value is in range.
   void jumpToPage(int page) {
-    for (final callback in _onJumpToPageCallbacks) {
-      callback(page);
-    }
+    onJumpToPageCallback?.call(page);
   }
 
   /// Animates the controlled [CarouselSlider] from the current page to the given page.
@@ -83,9 +97,7 @@ class CarouselController {
     ),
     Curve curve = Curves.linear,
   }) async {
-    for (final callback in _onAnimateToPageCallbacks) {
-      await callback(page, duration, curve);
-    }
+    await onAnimateToPageCallback?.call(page, duration, curve);
   }
 
   /// Starts the controlled [CarouselSlider] autoplay.
@@ -93,9 +105,7 @@ class CarouselController {
   /// The carousel will only autoPlay if the [autoPlay] parameter
   /// in [CarouselOptions] is true.
   void startAutoPlay() {
-    for (final callback in _onStartAutoPlayCallbacks) {
-      callback();
-    }
+    onStartAutoPlayCallback?.call();
   }
 
   /// Stops the controlled [CarouselSlider] from autoplaying.
@@ -103,38 +113,6 @@ class CarouselController {
   /// This is a more on-demand way of doing this. Use the [autoPlay]
   /// parameter in [CarouselOptions] to specify the autoPlay behaviour of the carousel.
   void stopAutoPlay() {
-    for (final callback in _onStopAutoPlayCallbacks) {
-      callback();
-    }
-  }
-
-  /// Set the [PageChangeCallback] to be called when the controlled [CarouselSlider] moves to the next page.
-  void setOnNextPage(PageChangeCallback callback) {
-    _onNextPageCallbacks.add(callback);
-  }
-
-  /// Set the [PageChangeCallback] to be called when the controlled [CarouselSlider] moves to the previous page.
-  void setOnPreviousPage(PageChangeCallback callback) {
-    _onPreviousPageCallbacks.add(callback);
-  }
-
-  /// Set the [JumpToCallback] to be called when the controlled [CarouselSlider] jumps to a specific page.
-  void setOnJumpToPage(JumpToCallback callback) {
-    _onJumpToPageCallbacks.add(callback);
-  }
-
-  /// Set the [AnimateToPageCallback] to be called when the controlled [CarouselSlider] animates to a specific page.
-  void setOnAnimateToPage(AnimateToPageCallback callback) {
-    _onAnimateToPageCallbacks.add(callback);
-  }
-
-  /// Set the [VoidCallback] to be called when the controlled [CarouselSlider] starts autoplay.
-  void setOnStartAutoPlay(VoidCallback callback) {
-    _onStartAutoPlayCallbacks.add(callback);
-  }
-
-  /// Set the [VoidCallback] to be called when the controlled [CarouselSlider] stops autoplay.
-  void setOnStopAutoPlay(VoidCallback callback) {
-    _onStopAutoPlayCallbacks.add(callback);
+    onStopAutoPlayCallback?.call();
   }
 }
