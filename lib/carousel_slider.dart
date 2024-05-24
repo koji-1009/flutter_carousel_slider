@@ -85,7 +85,7 @@ class _CarouselSliderState extends State<CarouselSlider>
   /// [Timer] to handle auto play
   Timer? _timer;
 
-  /// mode is related to why the page is being changed
+  /// [CarouselPageChangedReason] to determine the reason for page change
   CarouselPageChangedReason _mode = CarouselPageChangedReason.controller;
 
   /// [CarouselController] to control the carousel
@@ -110,11 +110,13 @@ class _CarouselSliderState extends State<CarouselSlider>
         if (isNeedResetTimer) {
           _clearTimer();
         }
+
         _mode = CarouselPageChangedReason.controller;
         await _pageController.nextPage(
           duration: duration,
           curve: curve,
         );
+
         if (isNeedResetTimer) {
           _resumeTimer();
         }
@@ -123,11 +125,13 @@ class _CarouselSliderState extends State<CarouselSlider>
         if (isNeedResetTimer) {
           _clearTimer();
         }
+
         _mode = CarouselPageChangedReason.controller;
         await _pageController.previousPage(
           duration: duration,
           curve: curve,
         );
+
         if (isNeedResetTimer) {
           _resumeTimer();
         }
@@ -140,7 +144,6 @@ class _CarouselSliderState extends State<CarouselSlider>
         );
 
         _mode = CarouselPageChangedReason.controller;
-
         final pageToJump = _pageController.page!.toInt() + page - index;
         _pageController.jumpToPage(pageToJump);
       },
@@ -157,10 +160,11 @@ class _CarouselSliderState extends State<CarouselSlider>
         if (widget.options.enableInfiniteScroll &&
             widget.itemCount != null &&
             widget.options.animateToClosest) {
-          if ((page - index).abs() > (page + widget.itemCount! - index).abs()) {
+          final distance = (page - index).abs();
+          final distanceWithNext = (page + widget.itemCount! - index).abs();
+          if (distance > distanceWithNext) {
             smallestMovement = page + widget.itemCount! - index;
-          } else if ((page - index).abs() >
-              (page - widget.itemCount! - index).abs()) {
+          } else if (distance > distanceWithNext) {
             smallestMovement = page - widget.itemCount! - index;
           }
         }
@@ -171,6 +175,7 @@ class _CarouselSliderState extends State<CarouselSlider>
           duration: duration,
           curve: curve,
         );
+
         if (isNeedResetTimer) {
           _resumeTimer();
         }
@@ -377,7 +382,7 @@ class _CarouselSliderState extends State<CarouselSlider>
       );
     }
 
-    if (true == widget.disableGesture) {
+    if (widget.disableGesture) {
       return NotificationListener<ScrollUpdateNotification>(
         onNotification: (notification) {
           widget.onScrolled?.call(_pageController.page);
