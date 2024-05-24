@@ -23,14 +23,21 @@ class CarouselOptions {
   /// Defaults to 0.
   final int initialPage;
 
-  ///Determines if carousel should loop infinitely or be limited to item length.
+  /// The actual index of the [PageView].
   ///
-  ///Defaults to true, i.e. infinite loop.
+  /// This value can be ignored unless you know the carousel will be scrolled
+  /// backwards more then 10000 pages.
+  /// Defaults to 10000 to simulate infinite backwards scrolling.
+  final int realPage;
+
+  /// Determines if carousel should loop infinitely or be limited to item length.
+  ///
+  /// Defaults to true, i.e. infinite loop.
   final bool enableInfiniteScroll;
 
-  ///Determines if carousel should loop to the closest occurence of requested page.
+  /// Determines if carousel should loop to the closest occurrence of requested page.
   ///
-  ///Defaults to true.
+  /// Defaults to true.
   final bool animateToClosest;
 
   /// Reverse the order of items if set to true.
@@ -105,7 +112,7 @@ class CarouselOptions {
   /// in the last item.
   final bool pauseAutoPlayInFiniteScroll;
 
-  /// Pass a `PageStorageKey` if you want to keep the pageview's position when it was recreated.
+  /// Pass a [PageStorageKey] if you want to keep the PageView's position when it was recreated.
   final PageStorageKey? pageViewKey;
 
   /// Use [enlargeStrategy] to determine which method to enlarge the center page.
@@ -132,6 +139,7 @@ class CarouselOptions {
     this.aspectRatio = 16 / 9,
     this.viewportFraction = 0.8,
     this.initialPage = 0,
+    this.realPage = 1000,
     this.enableInfiniteScroll = true,
     this.animateToClosest = true,
     this.reverse = false,
@@ -154,13 +162,13 @@ class CarouselOptions {
     this.clipBehavior = Clip.hardEdge,
   });
 
-  ///Generate new [CarouselOptions] based on old ones.
-
+  /// Generate new [CarouselOptions] based on old ones.
   CarouselOptions copyWith({
     double? height,
     double? aspectRatio,
     double? viewportFraction,
     int? initialPage,
+    int? realPage,
     bool? enableInfiniteScroll,
     bool? reverse,
     bool? autoPlay,
@@ -187,6 +195,7 @@ class CarouselOptions {
         aspectRatio: aspectRatio ?? this.aspectRatio,
         viewportFraction: viewportFraction ?? this.viewportFraction,
         initialPage: initialPage ?? this.initialPage,
+        realPage: realPage ?? this.realPage,
         enableInfiniteScroll: enableInfiniteScroll ?? this.enableInfiniteScroll,
         reverse: reverse ?? this.reverse,
         autoPlay: autoPlay ?? this.autoPlay,

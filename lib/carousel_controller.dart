@@ -1,46 +1,49 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
-import 'carousel_options.dart';
-import 'carousel_state.dart';
-import 'utils.dart';
+typedef PageChangeCallback = Future<void> Function(
+  Duration duration,
+  Curve curve,
+);
+typedef JumpToCallback = void Function(
+  int page,
+);
+typedef AnimateToPageCallback = Future<void> Function(
+  int page,
+  Duration duration,
+  Curve curve,
+);
 
 class CarouselController {
-  final Completer<void> _readyCompleter = Completer<void>();
+  CarouselController();
 
-  CarouselState? _state;
+  final List<PageChangeCallback> _onNextPageCallbacks = [];
+  final List<PageChangeCallback> _onPreviousPageCallbacks = [];
+  final List<JumpToCallback> _onJumpToPageCallbacks = [];
+  final List<AnimateToPageCallback> _onAnimateToPageCallbacks = [];
+  final List<VoidCallback> _onStartAutoPlayCallbacks = [];
+  final List<VoidCallback> _onStopAutoPlayCallbacks = [];
 
-  set state(CarouselState? state) {
-    _state = state;
-    if (!_readyCompleter.isCompleted) {
-      _readyCompleter.complete();
-    }
+  void dispose() {
+    _onNextPageCallbacks.clear();
+    _onPreviousPageCallbacks.clear();
+    _onJumpToPageCallbacks.clear();
+    _onAnimateToPageCallbacks.clear();
+    _onStartAutoPlayCallbacks.clear();
+    _onStopAutoPlayCallbacks.clear();
   }
-
-  void _setModeController() =>
-      _state!.changeMode(CarouselPageChangedReason.controller);
-
-  bool get ready => _state != null;
-
-  Future<void> get onReady => _readyCompleter.future;
 
   /// Animates the controlled [CarouselSlider] to the next page.
   ///
   /// The animation lasts for the given duration and follows the given curve.
   /// The returned [Future] resolves when the animation completes.
   Future<void> nextPage({
-    Duration? duration = const Duration(milliseconds: 300),
-    Curve? curve = Curves.linear,
+    Duration duration = const Duration(
+      milliseconds: 300,
+    ),
+    Curve curve = Curves.linear,
   }) async {
-    final bool isNeedResetTimer = _state!.options.pauseAutoPlayOnManualNavigate;
-    if (isNeedResetTimer) {
-      _state!.onResetTimer();
-    }
-    _setModeController();
-    await _state!.pageController!.nextPage(duration: duration!, curve: curve!);
-    if (isNeedResetTimer) {
-      _state!.onResumeTimer();
+    for (final callback in _onNextPageCallbacks) {
+      await callback(duration, curve);
     }
   }
 
@@ -49,18 +52,13 @@ class CarouselController {
   /// The animation lasts for the given duration and follows the given curve.
   /// The returned [Future] resolves when the animation completes.
   Future<void> previousPage({
-    Duration? duration = const Duration(milliseconds: 300),
-    Curve? curve = Curves.linear,
+    Duration duration = const Duration(
+      milliseconds: 300,
+    ),
+    Curve curve = Curves.linear,
   }) async {
-    final bool isNeedResetTimer = _state!.options.pauseAutoPlayOnManualNavigate;
-    if (isNeedResetTimer) {
-      _state!.onResetTimer();
-    }
-    _setModeController();
-    await _state!.pageController!
-        .previousPage(duration: duration!, curve: curve!);
-    if (isNeedResetTimer) {
-      _state!.onResumeTimer();
+    for (final callback in _onPreviousPageCallbacks) {
+      await callback(duration, curve);
     }
   }
 
@@ -69,15 +67,9 @@ class CarouselController {
   /// Jumps the page position from its current value to the given value,
   /// without animation, and without checking if the new value is in range.
   void jumpToPage(int page) {
-    final index = getRealIndex(
-      position: _state!.pageController!.page!.toInt(),
-      base: _state!.realPage - _state!.initialPage,
-      length: _state!.itemCount,
-    );
-
-    _setModeController();
-    final int pageToJump = _state!.pageController!.page!.toInt() + page - index;
-    return _state!.pageController!.jumpToPage(pageToJump);
+    for (final callback in _onJumpToPageCallbacks) {
+      callback(page);
+    }
   }
 
   /// Animates the controlled [CarouselSlider] from the current page to the given page.
@@ -86,37 +78,13 @@ class CarouselController {
   /// The returned [Future] resolves when the animation completes.
   Future<void> animateToPage(
     int page, {
-    Duration? duration = const Duration(milliseconds: 300),
-    Curve? curve = Curves.linear,
+    Duration duration = const Duration(
+      milliseconds: 300,
+    ),
+    Curve curve = Curves.linear,
   }) async {
-    final bool isNeedResetTimer = _state!.options.pauseAutoPlayOnManualNavigate;
-    if (isNeedResetTimer) {
-      _state!.onResetTimer();
-    }
-    final index = getRealIndex(
-      position: _state!.pageController!.page!.toInt(),
-      base: _state!.realPage - _state!.initialPage,
-      length: _state!.itemCount,
-    );
-    int smallestMovement = page - index;
-    if (_state!.options.enableInfiniteScroll &&
-        _state!.itemCount != null &&
-        _state!.options.animateToClosest) {
-      if ((page - index).abs() > (page + _state!.itemCount! - index).abs()) {
-        smallestMovement = page + _state!.itemCount! - index;
-      } else if ((page - index).abs() >
-          (page - _state!.itemCount! - index).abs()) {
-        smallestMovement = page - _state!.itemCount! - index;
-      }
-    }
-    _setModeController();
-    await _state!.pageController!.animateToPage(
-      _state!.pageController!.page!.toInt() + smallestMovement,
-      duration: duration!,
-      curve: curve!,
-    );
-    if (isNeedResetTimer) {
-      _state!.onResumeTimer();
+    for (final callback in _onAnimateToPageCallbacks) {
+      await callback(page, duration, curve);
     }
   }
 
@@ -125,7 +93,9 @@ class CarouselController {
   /// The carousel will only autoPlay if the [autoPlay] parameter
   /// in [CarouselOptions] is true.
   void startAutoPlay() {
-    _state!.onResumeTimer();
+    for (final callback in _onStartAutoPlayCallbacks) {
+      callback();
+    }
   }
 
   /// Stops the controlled [CarouselSlider] from autoplaying.
@@ -133,6 +103,38 @@ class CarouselController {
   /// This is a more on-demand way of doing this. Use the [autoPlay]
   /// parameter in [CarouselOptions] to specify the autoPlay behaviour of the carousel.
   void stopAutoPlay() {
-    _state!.onResetTimer();
+    for (final callback in _onStopAutoPlayCallbacks) {
+      callback();
+    }
+  }
+
+  /// Set the [PageChangeCallback] to be called when the controlled [CarouselSlider] moves to the next page.
+  void setOnNextPage(PageChangeCallback callback) {
+    _onNextPageCallbacks.add(callback);
+  }
+
+  /// Set the [PageChangeCallback] to be called when the controlled [CarouselSlider] moves to the previous page.
+  void setOnPreviousPage(PageChangeCallback callback) {
+    _onPreviousPageCallbacks.add(callback);
+  }
+
+  /// Set the [JumpToCallback] to be called when the controlled [CarouselSlider] jumps to a specific page.
+  void setOnJumpToPage(JumpToCallback callback) {
+    _onJumpToPageCallbacks.add(callback);
+  }
+
+  /// Set the [AnimateToPageCallback] to be called when the controlled [CarouselSlider] animates to a specific page.
+  void setOnAnimateToPage(AnimateToPageCallback callback) {
+    _onAnimateToPageCallbacks.add(callback);
+  }
+
+  /// Set the [VoidCallback] to be called when the controlled [CarouselSlider] starts autoplay.
+  void setOnStartAutoPlay(VoidCallback callback) {
+    _onStartAutoPlayCallbacks.add(callback);
+  }
+
+  /// Set the [VoidCallback] to be called when the controlled [CarouselSlider] stops autoplay.
+  void setOnStopAutoPlay(VoidCallback callback) {
+    _onStopAutoPlayCallbacks.add(callback);
   }
 }
