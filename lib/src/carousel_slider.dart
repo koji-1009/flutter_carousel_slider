@@ -372,14 +372,18 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
   void _handleAutoPlay() {
     final autoPlayEnabled = widget.options.autoPlay;
-    if (autoPlayEnabled && _timer != null) {
+    if (!autoPlayEnabled) {
+      _clearTimer();
+      return;
+    }
+
+    if (_timer != null) {
+      // already running
       return;
     }
 
     _clearTimer();
-    if (autoPlayEnabled) {
-      _resumeTimer();
-    }
+    _resumeTimer();
   }
 
   Widget _getCenterWrapper(Widget child) {
