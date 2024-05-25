@@ -140,6 +140,10 @@ class CarouselOptions {
   /// Whether or not to disable the `Center` widget for each slide.
   final bool disableCenter;
 
+  /// A flag to customize gestures within the items displayed in the carousel.
+  /// Setting it to true will disable gestures for [CarouselSlider].
+  final bool disableGesture;
+
   /// Whether to add padding to both ends of the list.
   /// If this is set to true and [viewportFraction] < 1.0, padding will be added such that the first and last child slivers will be in the center of the viewport when scrolled all the way to the start or end, respectively.
   /// If [viewportFraction] >= 1.0, this property has no effect.
@@ -173,6 +177,7 @@ class CarouselOptions {
     this.enlargeStrategy = CenterPageEnlargeStrategy.scale,
     this.enlargeFactor = 0.3,
     this.disableCenter = false,
+    this.disableGesture = false,
     this.padEnds = true,
     this.clipBehavior = Clip.hardEdge,
   });
@@ -202,6 +207,7 @@ class CarouselOptions {
     CenterPageEnlargeStrategy? enlargeStrategy,
     double? enlargeFactor,
     bool? disableCenter,
+    bool? disableGesture,
     Clip? clipBehavior,
     bool? padEnds,
   }) =>
@@ -231,6 +237,7 @@ class CarouselOptions {
         enlargeStrategy: enlargeStrategy ?? this.enlargeStrategy,
         enlargeFactor: enlargeFactor ?? this.enlargeFactor,
         disableCenter: disableCenter ?? this.disableCenter,
+        disableGesture: disableGesture ?? this.disableGesture,
         clipBehavior: clipBehavior ?? this.clipBehavior,
         padEnds: padEnds ?? this.padEnds,
       );

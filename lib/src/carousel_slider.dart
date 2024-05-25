@@ -31,7 +31,6 @@ class CarouselSlider extends StatefulWidget {
     required this.items,
     required this.options,
     this.carouselController,
-    this.disableGesture = false,
     this.onPageChanged,
     this.onScrolled,
   })  : itemBuilder = null,
@@ -46,7 +45,6 @@ class CarouselSlider extends StatefulWidget {
     required this.itemBuilder,
     required this.options,
     this.carouselController,
-    this.disableGesture = false,
     this.onPageChanged,
     this.onScrolled,
   }) : items = null;
@@ -65,16 +63,13 @@ class CarouselSlider extends StatefulWidget {
   /// [CarouselOptions] to customize the carousel widget.
   final CarouselOptions options;
 
-  /// Disable manual gesture on carousel,
-  final bool disableGesture;
-
   /// A [CarouselController], used to control the carousel.
   final CarouselController? carouselController;
 
   /// Called whenever the page in the center of the viewport changes.
   final CarouselPageChangedCallback? onPageChanged;
 
-  /// Called whenever the carousel is scrolled
+  /// Called whenever the carousel is scrolled.
   final CarouselOnScrolledCallback? onScrolled;
 
   @override
@@ -103,6 +98,9 @@ class _CarouselSliderState extends State<CarouselSlider> {
       initialPage: widget.options.initialPage +
           (widget.options.enableInfiniteScroll ? widget.options.realPage : 0),
     );
+    _pageController.addListener(() {
+      widget.onScrolled?.call(_pageController.page);
+    });
 
     final isNeedResetTimer = widget.options.pauseAutoPlayOnManualNavigate;
     _carouselController.setupCallbacks(
@@ -202,8 +200,18 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return _getGestureWrapper(
-      PageView.builder(
+    return _GestureHandler(
+      changeManualMode: () {
+        _mode = CarouselPageChangedReason.manual;
+      },
+      requestClearTimer: () {
+        _clearTimer();
+      },
+      requestResumeTimer: () {
+        _resumeTimer();
+      },
+      options: widget.options,
+      child: PageView.builder(
         key: widget.options.pageViewKey,
         padEnds: widget.options.padEnds,
         scrollBehavior: ScrollConfiguration.of(context).copyWith(
@@ -367,69 +375,6 @@ class _CarouselSliderState extends State<CarouselSlider> {
     }
   }
 
-  Widget _getGestureWrapper(Widget child) {
-    final Widget wrapper;
-    if (widget.options.height != null) {
-      wrapper = SizedBox(
-        height: widget.options.height,
-        child: child,
-      );
-    } else {
-      wrapper = AspectRatio(
-        aspectRatio: widget.options.aspectRatio,
-        child: child,
-      );
-    }
-
-    if (widget.disableGesture) {
-      return NotificationListener<ScrollUpdateNotification>(
-        onNotification: (notification) {
-          widget.onScrolled?.call(_pageController.page);
-          return false;
-        },
-        child: wrapper,
-      );
-    }
-
-    return RawGestureDetector(
-      behavior: HitTestBehavior.opaque,
-      gestures: {
-        PanGestureRecognizer:
-            GestureRecognizerFactoryWithHandlers<PanGestureRecognizer>(
-          () => PanGestureRecognizer(),
-          (instance) => instance
-            ..onStart = (_) {
-              _mode = CarouselPageChangedReason.manual;
-            }
-            ..onDown = (_) {
-              if (widget.options.pauseAutoPlayOnTouch) {
-                _clearTimer();
-              }
-
-              _mode = CarouselPageChangedReason.manual;
-            }
-            ..onEnd = (_) {
-              if (widget.options.pauseAutoPlayOnTouch) {
-                _resumeTimer();
-              }
-            }
-            ..onCancel = () {
-              if (widget.options.pauseAutoPlayOnTouch) {
-                _resumeTimer();
-              }
-            },
-        ),
-      },
-      child: NotificationListener<ScrollUpdateNotification>(
-        onNotification: (notification) {
-          widget.onScrolled?.call(_pageController.page);
-          return false;
-        },
-        child: wrapper,
-      ),
-    );
-  }
-
   Widget _getCenterWrapper(Widget child) {
     if (widget.options.disableCenter) {
       return Container(
@@ -479,5 +424,66 @@ class _CarouselSliderState extends State<CarouselSlider> {
           ),
         );
     }
+  }
+}
+
+class _GestureHandler extends StatelessWidget {
+  const _GestureHandler({
+    required this.changeManualMode,
+    required this.requestClearTimer,
+    required this.requestResumeTimer,
+    required this.options,
+    required this.child,
+  });
+
+  final VoidCallback changeManualMode;
+  final VoidCallback requestClearTimer;
+  final VoidCallback requestResumeTimer;
+  final CarouselOptions options;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget body;
+    if (options.height != null) {
+      body = SizedBox(
+        height: options.height,
+        child: child,
+      );
+    } else {
+      body = AspectRatio(
+        aspectRatio: options.aspectRatio,
+        child: child,
+      );
+    }
+
+    if (options.disableGesture) {
+      return body;
+    }
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onPanStart: (_) {
+        changeManualMode();
+      },
+      onPanDown: (_) {
+        if (options.pauseAutoPlayOnTouch) {
+          requestClearTimer();
+        }
+
+        changeManualMode();
+      },
+      onPanEnd: (_) {
+        if (options.pauseAutoPlayOnTouch) {
+          requestResumeTimer();
+        }
+      },
+      onPanCancel: () {
+        if (options.pauseAutoPlayOnTouch) {
+          requestResumeTimer();
+        }
+      },
+      child: body,
+    );
   }
 }
