@@ -81,8 +81,7 @@ class CarouselSlider extends StatefulWidget {
   State<CarouselSlider> createState() => _CarouselSliderState();
 }
 
-class _CarouselSliderState extends State<CarouselSlider>
-    with TickerProviderStateMixin {
+class _CarouselSliderState extends State<CarouselSlider> {
   /// [Timer] to handle auto play
   Timer? _timer;
 
