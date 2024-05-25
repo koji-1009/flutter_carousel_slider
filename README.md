@@ -78,7 +78,7 @@ CarouselSlider(
  )
 ```
 
-Since `v2.0.0`, you'll need to pass the options to `CarouselOptions`. For each option's usage you can refer to [carousel_options.dart](./lib/carousel_options.dart).
+Since `v2.0.0`, you'll need to pass the options to `CarouselOptions`. For each option's usage you can refer to [carousel_options.dart](lib/src/carousel_options.dart).
 
 **If you pass the `height` parameter, the `aspectRatio` parameter will be ignored.**
 
