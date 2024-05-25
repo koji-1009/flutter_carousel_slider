@@ -246,8 +246,10 @@ class _CarouselSliderState extends State<CarouselSlider> {
         },
         itemBuilder: (context, idx) {
           final index = getRealIndex(
-            position: idx + widget.options.initialPage,
-            base: widget.options.realPage,
+            position: idx,
+            base: widget.options.enableInfiniteScroll
+                ? widget.options.realPage
+                : 0,
             length: widget.itemCount,
           );
 
