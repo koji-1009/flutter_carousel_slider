@@ -92,6 +92,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // After the first build method, request a redraw
+      setState(() {});
+    });
+
     _carouselController = widget.carouselController ?? CarouselController();
     _pageController = PageController(
       viewportFraction: widget.options.viewportFraction,
@@ -241,8 +246,10 @@ class _CarouselSliderState extends State<CarouselSlider> {
         },
         itemBuilder: (context, idx) {
           final index = getRealIndex(
-            position: idx + widget.options.initialPage,
-            base: widget.options.realPage,
+            position: idx,
+            base: widget.options.enableInfiniteScroll
+                ? widget.options.realPage
+                : 0,
             length: widget.itemCount,
           );
 
@@ -365,14 +372,18 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
   void _handleAutoPlay() {
     final autoPlayEnabled = widget.options.autoPlay;
-    if (autoPlayEnabled && _timer != null) {
+    if (!autoPlayEnabled) {
+      _clearTimer();
+      return;
+    }
+
+    if (_timer != null) {
+      // already running
       return;
     }
 
     _clearTimer();
-    if (autoPlayEnabled) {
-      _resumeTimer();
-    }
+    _resumeTimer();
   }
 
   Widget _getCenterWrapper(Widget child) {
