@@ -92,6 +92,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // After the first build method, request a redraw
+      setState(() {});
+    });
+
     _carouselController = widget.carouselController ?? CarouselController();
     _pageController = PageController(
       viewportFraction: widget.options.viewportFraction,
