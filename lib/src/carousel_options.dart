@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
 
-enum CarouselPageChangedReason { timed, manual, controller }
+/// Reason for the page change.
+enum CarouselPageChangedReason {
+  /// The page change was triggered by auto play.
+  timed,
 
-enum CenterPageEnlargeStrategy { scale, height, zoom }
+  /// The page change was triggered by user gesture.
+  manual,
+
+  /// The page change was triggered by a call to [CarouselController].
+  controller,
+}
+
+/// Strategy for enlarging effect.
+enum CenterPageEnlargeStrategy {
+  height,
+  zoom,
+  scale,
+}
 
 class CarouselOptions {
   /// Set carousel height and overrides any existing [aspectRatio].

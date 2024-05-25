@@ -22,7 +22,10 @@ typedef CarouselOnScrolledCallback = void Function(
   double? position,
 );
 
+/// A carousel slider widget.
 class CarouselSlider extends StatefulWidget {
+  /// Create [CarouselSlider] widget.
+  /// The [items] contains the list of widgets that will be shown in the carousel.
   const CarouselSlider({
     super.key,
     required this.items,
@@ -34,7 +37,9 @@ class CarouselSlider extends StatefulWidget {
   })  : itemBuilder = null,
         itemCount = items != null ? items.length : 0;
 
-  /// The on demand item builder constructor
+  /// Create [CarouselSlider] widget using builder.
+  /// The [itemBuilder] will be used to build item on demand.
+  /// The [itemCount] is the number of items in the carousel.
   const CarouselSlider.builder({
     super.key,
     required this.itemCount,
@@ -46,24 +51,25 @@ class CarouselSlider extends StatefulWidget {
     this.onScrolled,
   }) : items = null;
 
-  /// [CarouselOptions] to create a [CarouselState] with
-  final CarouselOptions options;
-
-  final bool disableGesture;
-
   /// The widgets to be shown in the carousel of default constructor
   final List<Widget>? items;
 
+  /// The widgets count that should be shown at carousel.
+  final int? itemCount;
+
   /// The widget item builder that will be used to build item on demand
-  /// The third argument is the PageView's real index, can be used to cooperate
+  /// The third argument is the [PageView]'s real index, can be used to cooperate
   /// with Hero.
   final ExtendedIndexedWidgetBuilder? itemBuilder;
 
+  /// [CarouselOptions] to customize the carousel widget.
+  final CarouselOptions options;
+
+  /// Disable manual gesture on carousel,
+  final bool disableGesture;
+
   /// A [CarouselController], used to control the carousel.
   final CarouselController? carouselController;
-
-  /// The widgets count that should be shown at carousel.
-  final int? itemCount;
 
   /// Called whenever the page in the center of the viewport changes.
   final CarouselPageChangedCallback? onPageChanged;
@@ -280,25 +286,24 @@ class _CarouselSliderState extends State<CarouselSlider>
                   MediaQuery.sizeOf(context).width *
                       (1 / widget.options.aspectRatio);
 
-              if (widget.options.scrollDirection == Axis.horizontal) {
-                return _getCenterWrapper(
-                  _getEnlargeWrapper(
-                    child,
-                    height: distortionValue * height,
-                    scale: distortionValue,
-                    itemOffset: itemOffset,
+              return switch (widget.options.scrollDirection) {
+                Axis.horizontal => _getCenterWrapper(
+                    _getEnlargeWrapper(
+                      child,
+                      height: distortionValue * height,
+                      scale: distortionValue,
+                      itemOffset: itemOffset,
+                    ),
                   ),
-                );
-              } else {
-                return _getCenterWrapper(
-                  _getEnlargeWrapper(
-                    child,
-                    width: distortionValue * MediaQuery.sizeOf(context).width,
-                    scale: distortionValue,
-                    itemOffset: itemOffset,
+                Axis.vertical => _getCenterWrapper(
+                    _getEnlargeWrapper(
+                      child,
+                      width: distortionValue * MediaQuery.sizeOf(context).width,
+                      scale: distortionValue,
+                      itemOffset: itemOffset,
+                    ),
                   ),
-                );
-              }
+              };
             },
           );
         },
@@ -444,34 +449,36 @@ class _CarouselSliderState extends State<CarouselSlider>
     double? scale,
     required double itemOffset,
   }) {
-    if (widget.options.enlargeStrategy == CenterPageEnlargeStrategy.height) {
-      return SizedBox(
-        width: width,
-        height: height,
-        child: child,
-      );
+    switch (widget.options.enlargeStrategy) {
+      case CenterPageEnlargeStrategy.height:
+        return SizedBox(
+          width: width,
+          height: height,
+          child: child,
+        );
+      case CenterPageEnlargeStrategy.zoom:
+        final Alignment alignment;
+        final horizontal = widget.options.scrollDirection == Axis.horizontal;
+        if (itemOffset > 0) {
+          alignment =
+              horizontal ? Alignment.centerRight : Alignment.bottomCenter;
+        } else {
+          alignment = horizontal ? Alignment.centerLeft : Alignment.topCenter;
+        }
+        return Transform.scale(
+          scale: scale!,
+          alignment: alignment,
+          child: child,
+        );
+      case CenterPageEnlargeStrategy.scale:
+        return Transform.scale(
+          scale: scale!,
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: child,
+          ),
+        );
     }
-    if (widget.options.enlargeStrategy == CenterPageEnlargeStrategy.zoom) {
-      final Alignment alignment;
-      final horizontal = widget.options.scrollDirection == Axis.horizontal;
-      if (itemOffset > 0) {
-        alignment = horizontal ? Alignment.centerRight : Alignment.bottomCenter;
-      } else {
-        alignment = horizontal ? Alignment.centerLeft : Alignment.topCenter;
-      }
-      return Transform.scale(
-        scale: scale!,
-        alignment: alignment,
-        child: child,
-      );
-    }
-    return Transform.scale(
-      scale: scale!,
-      child: SizedBox(
-        width: width,
-        height: height,
-        child: child,
-      ),
-    );
   }
 }
