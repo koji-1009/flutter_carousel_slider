@@ -1,33 +1,38 @@
-# carousel_slider
+# carousel_slider_x
 
-A carousel slider widget.
+This package is a fork of the original [carousel_slider](https://pub.dev/packages/carousel_slider) package.
+
+A carousel slider widget, support infinite scroll and auto play, enlarge mode.
 
 ## Features 
 
 * Infinite scroll 
-* Custom child widgets
 * Auto play
-
-## Supported platforms
-
-* Flutter Android
-* Flutter iOS
-* Flutter web
-* Flutter desktop
+* Enlarge center page
 
 ## Live preview
 
-https://serenader2014.github.io/flutter_carousel_slider/#/
-
-Note: this page is built with flutter-web. For a better user experience, please use a mobile device to open this link.
+https://koji-1009.github.io/flutter_carousel_slider/
 
 ## Installation
 
-Add `carousel_slider: ^4.2.1` to your `pubspec.yaml` dependencies. And import it:
+Add `carousel_slider_x: ^5.0.0` to your `pubspec.yaml` dependencies.
+And import it:
 
 ```dart
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider_x/carousel_slider_x.dart';
 ```
+
+### Migration
+
+If you are migrating from the original `carousel_slider` package, you should move the following property from `CarouselOptions` to `CarouselSlider`.
+
+* `onPageChanged`
+* `onScrolled`
+
+And, you should move the following properties from `CarouselSlider` to `CarouselOptions`.
+
+* `disableGesture`
 
 ## How to use
 
@@ -35,31 +40,35 @@ Simply create a `CarouselSlider` widget, and pass the required params:
 
 ```dart
 CarouselSlider(
-  options: CarouselOptions(height: 400.0),
+  options: const CarouselOptions(
+    height: 400,
+  ),
   items: [1,2,3,4,5].map((i) {
-    return Builder(
-      builder: (BuildContext context) {
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.symmetric(horizontal: 5.0),
-          decoration: BoxDecoration(
-            color: Colors.amber
-          ),
-          child: Text('text $i', style: TextStyle(fontSize: 16.0),)
-        );
-      },
+    Container(
+      width: MediaQuery.sizeOf(context).width,
+      margin: EdgeInsets.symmetric(
+        horizontal: 8.
+      ),
+      decoration: BoxDecoration(
+        color: Colors.amber
+      ),
+      child: Text(
+        'text $i', 
+        style: TextStyle(
+          fontSize: 16,
+        ),
+      ),
     );
-  }).toList(),
+  }.toList(),
 )
 ```
 
 ## Params
 
 ```dart
-
 CarouselSlider(
    items: items,
-   options: CarouselOptions(
+   options: const CarouselOptions(
       height: 400,
       aspectRatio: 16/9,
       viewportFraction: 0.8,
@@ -78,20 +87,20 @@ CarouselSlider(
  )
 ```
 
-Since `v2.0.0`, you'll need to pass the options to `CarouselOptions`. For each option's usage you can refer to [carousel_options.dart](lib/src/carousel_options.dart).
+For each option's usage you can refer to [carousel_options.dart](lib/src/carousel_options.dart).
 
 **If you pass the `height` parameter, the `aspectRatio` parameter will be ignored.**
 
 ## Build item widgets on demand
 
-This method will save memory by building items once it becomes necessary. This way they won't be built if they're not currently meant to be visible on screen.
+This method will save memory by building items once it becomes necessary.
+This way they won't be built if they're not currently meant to be visible on screen.
 It can be used to build different child item widgets related to content or by item index.
 
 ```dart
-
 CarouselSlider.builder(
   itemCount: 15,
-  itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) =>
+  itemBuilder: (BuildContext context, int itemIndex, int realIndex) =>
     Container(
       child: Text(itemIndex.toString()),
     ),
@@ -100,19 +109,20 @@ CarouselSlider.builder(
 
 ## Carousel controller
 
-In order to manually control the pageview's position, you can create your own `CarouselController`, and pass it to `CarouselSlider`. Then you can use the `CarouselController` instance to manipulate the position.
+In order to manually control the PageView's position, you can create your own `CarouselController`, and pass it to `CarouselSlider`.
+Then you can use the `CarouselController` instance to manipulate the position.
 
 ```dart 
-class CarouselDemo extends StatelessWidget {
-  CarouselController buttonCarouselController = CarouselController();
+class _CarouselDemoState extends State<CarouselDemo> {
+  final buttonCarouselController = CarouselController();
 
- @override
+  @override
   Widget build(BuildContext context) => Column(
     children: <Widget>[
       CarouselSlider(
         items: child,
         carouselController: buttonCarouselController,
-        options: CarouselOptions(
+        options: const CarouselOptions(
           autoPlay: false,
           enlargeCenterPage: true,
           viewportFraction: 0.9,
@@ -121,8 +131,7 @@ class CarouselDemo extends StatelessWidget {
         ),
       ),
       RaisedButton(
-        onPressed: () => buttonCarouselController.nextPage(
-            duration: Duration(milliseconds: 300), curve: Curves.linear),
+        onPressed: () => buttonCarouselController.nextPage(),
         child: Text('→'),
       )
     ]
@@ -170,7 +179,7 @@ Image carousel slider with custom indicator demo:
 
 ![indicator](screenshot/indicator.gif)
 
-Custom `CarouselController` and manually control the pageview position demo:
+Custom `CarouselController` and manually control the PageView position demo:
 
 ![manual](screenshot/manually.gif)
 
@@ -184,10 +193,6 @@ Simple on-demand image carousel slider, with image auto prefetch demo:
 
 No infinite scroll demo:
 
-![noloop](screenshot/noloop.gif)
+![no loop](screenshot/noloop.gif)
 
 All screenshots above can be found at the example project.
-
-## License
-
-MIT
