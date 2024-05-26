@@ -12,22 +12,12 @@
 int getRealIndex({
   required int position,
   required int base,
-  required int? length,
+  required int length,
 }) {
-  final offset = position - base;
-  return remainder(
-    input: offset,
-    source: length,
-  );
-}
+  assert(length > 0, 'Length must be greater than 0');
+  if (length == 0) return 0;
 
-/// Returns the remainder of the modulo operation [input] % [source], and adjust it for
-/// negative values.
-int remainder({
-  required int input,
-  required int? source,
-}) {
-  if (source == null || source == 0) return 0;
-  final result = input % source;
-  return result < 0 ? source + result : result;
+  final offset = position - base;
+  final result = offset % length;
+  return result < 0 ? length + result : result;
 }

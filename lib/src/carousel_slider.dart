@@ -34,7 +34,7 @@ class CarouselSlider extends StatefulWidget {
     this.onPageChanged,
     this.onScrolled,
   })  : itemBuilder = null,
-        itemCount = items != null ? items.length : 0;
+        itemCount = items.length;
 
   /// Create [CarouselSlider] widget using builder.
   /// The [itemBuilder] will be used to build item on demand.
@@ -47,13 +47,13 @@ class CarouselSlider extends StatefulWidget {
     this.carouselController,
     this.onPageChanged,
     this.onScrolled,
-  }) : items = null;
+  }) : items = const [];
 
   /// The widgets to be shown in the carousel of default constructor
-  final List<Widget>? items;
+  final List<Widget> items;
 
   /// The widgets count that should be shown at carousel.
-  final int? itemCount;
+  final int itemCount;
 
   /// The widget item builder that will be used to build item on demand
   /// The third argument is the [PageView]'s real index, can be used to cooperate
@@ -161,14 +161,13 @@ class _CarouselSliderState extends State<CarouselSlider> {
         );
         var smallestMovement = page - index;
         if (widget.options.enableInfiniteScroll &&
-            widget.itemCount != null &&
             widget.options.animateToClosest) {
           final distance = (page - index).abs();
-          final distanceWithNext = (page + widget.itemCount! - index).abs();
+          final distanceWithNext = (page + widget.itemCount - index).abs();
           if (distance > distanceWithNext) {
-            smallestMovement = page + widget.itemCount! - index;
+            smallestMovement = page + widget.itemCount - index;
           } else if (distance > distanceWithNext) {
-            smallestMovement = page - widget.itemCount! - index;
+            smallestMovement = page - widget.itemCount - index;
           }
         }
 
@@ -205,122 +204,132 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
   @override
   Widget build(BuildContext context) {
-    return _GestureHandler(
-      changeManualMode: () {
-        _mode = CarouselPageChangedReason.manual;
-      },
-      requestClearTimer: () {
-        _clearTimer();
-      },
-      requestResumeTimer: () {
-        _resumeTimer();
-      },
-      options: widget.options,
-      child: PageView.builder(
-        key: widget.options.pageViewKey,
-        padEnds: widget.options.padEnds,
-        scrollBehavior: ScrollConfiguration.of(context).copyWith(
-          scrollbars: false,
-          overscroll: false,
-          dragDevices: {
-            PointerDeviceKind.touch,
-            PointerDeviceKind.mouse,
-          },
-        ),
-        clipBehavior: widget.options.clipBehavior,
-        physics: widget.options.scrollPhysics,
-        scrollDirection: widget.options.scrollDirection,
-        pageSnapping: widget.options.pageSnapping,
-        controller: _pageController,
-        reverse: widget.options.reverse,
-        itemCount:
-            widget.options.enableInfiniteScroll ? null : widget.itemCount,
-        onPageChanged: (index) {
-          final currentPage = getRealIndex(
-            position: index + widget.options.initialPage,
-            base: widget.options.realPage,
-            length: widget.itemCount,
-          );
-
-          widget.onPageChanged?.call(currentPage, _mode);
+    return LayoutBuilder(
+      builder: (context, constraints) => _GestureHandler(
+        changeManualMode: () {
+          _mode = CarouselPageChangedReason.manual;
         },
-        itemBuilder: (context, idx) {
-          final index = getRealIndex(
-            position: idx,
-            base: widget.options.enableInfiniteScroll
-                ? widget.options.realPage
-                : 0,
-            length: widget.itemCount,
-          );
+        requestClearTimer: () {
+          _clearTimer();
+        },
+        requestResumeTimer: () {
+          _resumeTimer();
+        },
+        options: widget.options,
+        child: PageView.builder(
+          key: widget.options.pageViewKey,
+          padEnds: widget.options.padEnds,
+          scrollBehavior: ScrollConfiguration.of(context).copyWith(
+            scrollbars: false,
+            overscroll: false,
+            dragDevices: {
+              PointerDeviceKind.touch,
+              PointerDeviceKind.mouse,
+            },
+          ),
+          clipBehavior: widget.options.clipBehavior,
+          physics: widget.options.scrollPhysics,
+          scrollDirection: widget.options.scrollDirection,
+          pageSnapping: widget.options.pageSnapping,
+          controller: _pageController,
+          reverse: widget.options.reverse,
+          itemCount:
+              widget.options.enableInfiniteScroll ? null : widget.itemCount,
+          onPageChanged: (index) {
+            final currentPage = getRealIndex(
+              position: index + widget.options.initialPage,
+              base: widget.options.realPage,
+              length: widget.itemCount,
+            );
 
-          return AnimatedBuilder(
-            animation: _pageController,
-            child: widget.items != null
-                ? widget.items!.isNotEmpty
-                    ? widget.items![index]
-                    : const SizedBox.shrink()
-                : widget.itemBuilder!(context, index, idx),
-            builder: (context, child) {
-              var distortionValue = 1.0;
-              // if `enlargeCenterPage` is true, we must calculate the carousel item's height
-              // to display the visual effect
-              var itemOffset = 0.0;
-              if (widget.options.enlargeCenterPage != null &&
-                  widget.options.enlargeCenterPage == true) {
-                // pageController.page can only be accessed after the first build,
-                // so in the first build we calculate the item offset manually
-                var position = _pageController.position;
-                if (position.hasPixels && position.hasContentDimensions) {
-                  final page = _pageController.page;
-                  if (page != null) {
-                    itemOffset = page - idx;
-                  }
-                } else {
-                  final storageContext =
-                      _pageController.position.context.storageContext;
-                  final previousSavedPosition = PageStorage.of(storageContext)
-                      .readState(storageContext) as double?;
-                  if (previousSavedPosition != null) {
-                    itemOffset = previousSavedPosition - idx.toDouble();
+            widget.onPageChanged?.call(currentPage, _mode);
+          },
+          itemBuilder: (context, realIndex) {
+            final index = getRealIndex(
+              position: realIndex,
+              base: widget.options.enableInfiniteScroll
+                  ? widget.options.realPage
+                  : 0,
+              length: widget.itemCount,
+            );
+
+            final child = widget.itemBuilder != null
+                ? widget.itemBuilder!(context, index, realIndex)
+                : widget.items[index];
+            return AnimatedBuilder(
+              animation: _pageController,
+              child: child,
+              builder: (context, child) {
+                var scale = 1.0;
+                // if `enlargeCenterPage` is true, we must calculate the carousel item's height
+                // to display the visual effect
+                var itemOffset = 0.0;
+                if (widget.options.enlargeCenterPage) {
+                  // pageController.page can only be accessed after the first build,
+                  // so in the first build we calculate the item offset manually
+                  final position = _pageController.position;
+                  if (position.hasPixels && position.hasContentDimensions) {
+                    final page = _pageController.page;
+                    if (page != null) {
+                      itemOffset = page - realIndex;
+                    }
                   } else {
-                    itemOffset =
-                        widget.options.realPage.toDouble() - idx.toDouble();
+                    final storageContext = position.context.storageContext;
+                    final previousSavedPosition = PageStorage.of(storageContext)
+                        .readState(storageContext) as double?;
+                    if (previousSavedPosition != null) {
+                      itemOffset = previousSavedPosition - realIndex;
+                    } else {
+                      itemOffset = (widget.options.realPage - realIndex) * 1.0;
+                    }
                   }
+
+                  final enlargeFactor =
+                      widget.options.enlargeFactor.clamp(0.0, 1.0);
+                  final distortionRatio =
+                      (1.0 - (itemOffset.abs() * enlargeFactor))
+                          .clamp(0.0, 1.0)
+                          .toDouble();
+                  scale = Curves.easeOut.transform(distortionRatio);
                 }
 
-                final enlargeFactor =
-                    widget.options.enlargeFactor.clamp(0.0, 1.0);
-                final distortionRatio = (1 - (itemOffset.abs() * enlargeFactor))
-                    .clamp(0.0, 1.0)
-                    .toDouble();
-                distortionValue = Curves.easeOut.transform(distortionRatio);
-              }
-
-              final height = widget.options.height ??
-                  MediaQuery.sizeOf(context).width *
-                      (1 / widget.options.aspectRatio);
-
-              return switch (widget.options.scrollDirection) {
-                Axis.horizontal => _getCenterWrapper(
-                    _getEnlargeWrapper(
-                      child,
-                      height: distortionValue * height,
-                      scale: distortionValue,
-                      itemOffset: itemOffset,
+                final (enlargeHeight, enlargeWidth) =
+                    switch (widget.options.scrollDirection) {
+                  Axis.horizontal => (
+                      (widget.options.height ??
+                              constraints.maxWidth *
+                                  (1 / widget.options.aspectRatio)) *
+                          scale,
+                      null,
                     ),
-                  ),
-                Axis.vertical => _getCenterWrapper(
-                    _getEnlargeWrapper(
-                      child,
-                      width: distortionValue * MediaQuery.sizeOf(context).width,
-                      scale: distortionValue,
-                      itemOffset: itemOffset,
+                  Axis.vertical => (
+                      null,
+                      constraints.maxWidth * scale,
                     ),
-                  ),
-              };
-            },
-          );
-        },
+                };
+
+                return _EnlargeItem(
+                  options: widget.options,
+                  strategyOption: switch (widget.options.enlargeStrategy) {
+                    CenterPageEnlargeStrategy.height => _Height(
+                        height: enlargeHeight,
+                      ),
+                    CenterPageEnlargeStrategy.zoom => _Zoom(
+                        scale: scale,
+                        itemOffset: itemOffset,
+                      ),
+                    CenterPageEnlargeStrategy.scale => _Scale(
+                        scale: scale,
+                        width: enlargeWidth,
+                        height: enlargeHeight,
+                      ),
+                  },
+                  child: child,
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
@@ -352,7 +361,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       _mode = CarouselPageChangedReason.timed;
 
       var nextPage = _pageController.page!.round() + 1;
-      final itemCount = widget.itemCount ?? widget.items!.length;
+      final itemCount = widget.itemCount;
       if (nextPage >= itemCount && !widget.options.enableInfiniteScroll) {
         if (widget.options.pauseAutoPlayInFiniteScroll) {
           _clearTimer();
@@ -384,57 +393,6 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
     _clearTimer();
     _resumeTimer();
-  }
-
-  Widget _getCenterWrapper(Widget child) {
-    if (widget.options.disableCenter) {
-      return Container(
-        child: child,
-      );
-    }
-    return Center(
-      child: child,
-    );
-  }
-
-  Widget _getEnlargeWrapper(
-    Widget? child, {
-    double? width,
-    double? height,
-    double? scale,
-    required double itemOffset,
-  }) {
-    switch (widget.options.enlargeStrategy) {
-      case CenterPageEnlargeStrategy.height:
-        return SizedBox(
-          width: width,
-          height: height,
-          child: child,
-        );
-      case CenterPageEnlargeStrategy.zoom:
-        final Alignment alignment;
-        final horizontal = widget.options.scrollDirection == Axis.horizontal;
-        if (itemOffset > 0) {
-          alignment =
-              horizontal ? Alignment.centerRight : Alignment.bottomCenter;
-        } else {
-          alignment = horizontal ? Alignment.centerLeft : Alignment.topCenter;
-        }
-        return Transform.scale(
-          scale: scale!,
-          alignment: alignment,
-          child: child,
-        );
-      case CenterPageEnlargeStrategy.scale:
-        return Transform.scale(
-          scale: scale!,
-          child: SizedBox(
-            width: width,
-            height: height,
-            child: child,
-          ),
-        );
-    }
   }
 }
 
@@ -497,4 +455,84 @@ class _GestureHandler extends StatelessWidget {
       child: body,
     );
   }
+}
+
+class _EnlargeItem extends StatelessWidget {
+  const _EnlargeItem({
+    required this.options,
+    required this.strategyOption,
+    required this.child,
+  });
+
+  final CarouselOptions options;
+  final _StrategyOption strategyOption;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = options.disableCenter
+        ? child
+        : Center(
+            child: child,
+          );
+
+    return switch (strategyOption) {
+      _Height(:final height) => SizedBox(
+          height: height,
+          child: body,
+        ),
+      _Zoom(:final scale, :final itemOffset) => Transform.scale(
+          scale: scale,
+          alignment: switch (options.scrollDirection) {
+            Axis.horizontal =>
+              itemOffset > 0 ? Alignment.centerRight : Alignment.centerLeft,
+            Axis.vertical =>
+              itemOffset > 0 ? Alignment.bottomCenter : Alignment.topCenter,
+          },
+          child: body,
+        ),
+      _Scale(:final scale, :final width, :final height) => Transform.scale(
+          scale: scale,
+          child: SizedBox(
+            width: width,
+            height: height,
+            child: body,
+          ),
+        ),
+    };
+  }
+}
+
+sealed class _StrategyOption {
+  const _StrategyOption();
+}
+
+class _Height extends _StrategyOption {
+  const _Height({
+    required this.height,
+  });
+
+  final double? height;
+}
+
+class _Zoom extends _StrategyOption {
+  const _Zoom({
+    required this.scale,
+    required this.itemOffset,
+  });
+
+  final double scale;
+  final double itemOffset;
+}
+
+class _Scale extends _StrategyOption {
+  const _Scale({
+    required this.scale,
+    required this.width,
+    required this.height,
+  });
+
+  final double scale;
+  final double? width;
+  final double? height;
 }
