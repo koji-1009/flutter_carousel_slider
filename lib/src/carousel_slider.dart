@@ -34,7 +34,7 @@ class CarouselSlider extends StatefulWidget {
     this.onPageChanged,
     this.onScrolled,
   })  : itemBuilder = null,
-        itemCount = items != null ? items.length : 0;
+        itemCount = items.length;
 
   /// Create [CarouselSlider] widget using builder.
   /// The [itemBuilder] will be used to build item on demand.
@@ -47,13 +47,13 @@ class CarouselSlider extends StatefulWidget {
     this.carouselController,
     this.onPageChanged,
     this.onScrolled,
-  }) : items = null;
+  }) : items = const [];
 
   /// The widgets to be shown in the carousel of default constructor
-  final List<Widget>? items;
+  final List<Widget> items;
 
   /// The widgets count that should be shown at carousel.
-  final int? itemCount;
+  final int itemCount;
 
   /// The widget item builder that will be used to build item on demand
   /// The third argument is the [PageView]'s real index, can be used to cooperate
@@ -161,14 +161,13 @@ class _CarouselSliderState extends State<CarouselSlider> {
         );
         var smallestMovement = page - index;
         if (widget.options.enableInfiniteScroll &&
-            widget.itemCount != null &&
             widget.options.animateToClosest) {
           final distance = (page - index).abs();
-          final distanceWithNext = (page + widget.itemCount! - index).abs();
+          final distanceWithNext = (page + widget.itemCount - index).abs();
           if (distance > distanceWithNext) {
-            smallestMovement = page + widget.itemCount! - index;
+            smallestMovement = page + widget.itemCount - index;
           } else if (distance > distanceWithNext) {
-            smallestMovement = page - widget.itemCount! - index;
+            smallestMovement = page - widget.itemCount - index;
           }
         }
 
@@ -256,7 +255,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
             final child = widget.itemBuilder != null
                 ? widget.itemBuilder!(context, index, realIndex)
-                : widget.items![index];
+                : widget.items[index];
             return AnimatedBuilder(
               animation: _pageController,
               child: child,
@@ -362,7 +361,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       _mode = CarouselPageChangedReason.timed;
 
       var nextPage = _pageController.page!.round() + 1;
-      final itemCount = widget.itemCount ?? widget.items!.length;
+      final itemCount = widget.itemCount;
       if (nextPage >= itemCount && !widget.options.enableInfiniteScroll) {
         if (widget.options.pauseAutoPlayInFiniteScroll) {
           _clearTimer();
