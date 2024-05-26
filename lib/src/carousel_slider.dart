@@ -29,7 +29,7 @@ class CarouselSlider extends StatefulWidget {
   const CarouselSlider({
     super.key,
     required this.items,
-    required this.options,
+    this.options = const CarouselOptions(),
     this.carouselController,
     this.onPageChanged,
     this.onScrolled,
@@ -43,7 +43,7 @@ class CarouselSlider extends StatefulWidget {
     super.key,
     required this.itemCount,
     required this.itemBuilder,
-    required this.options,
+    this.options = const CarouselOptions(),
     this.carouselController,
     this.onPageChanged,
     this.onScrolled,
