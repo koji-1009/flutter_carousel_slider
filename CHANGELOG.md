@@ -1,9 +1,24 @@
-# 4.2.1
+## 5.0.0
+
+Forked and renamed the library.
+
+* Migrate to dart 3.0
+* Move following properties from `CarouselOptions` to `CarouselSlider`
+    * `onPageChanged`
+    * `onScrolled`
+* Move the following properties from `CarouselSlider` to `CarouselOptions`
+    * `disableGesture`
+* Change `CarouselOptions` to immutable class
+* Nullability cleanup
+* Cleanup state management
+* Recreate example project by Flutter 3.22
+
+## 4.2.1
 
 - [FIX] temporary remove `PointerDeviceKind.trackpad`
 - [FIX] fix `'double?'` type
 
-# 4.2.0
+## 4.2.0
 
 - [Add] `enlargeFactor` option
 - [Add] `CenterPageEnlargeStrategy.zoom` option
@@ -12,84 +27,85 @@
 - [FIX] clear timer if widget was unmounted
 - [FIX] scroll carousel using touchpad
 
-# 4.1.1
+## 4.1.1
 
 - Fix code formatting
 
-# 4.1.0
+## 4.1.0
 
-## Add
+### Add
 
 - Exposed `clipBehavior` in `CarouselOptions`
 - Exposed `padEnds` in `CarouselOptions`
 - Add `copyWith` method to `CarouselOptions`
 
-## Fix
+### Fix
 
 - [FIX] Can't swipe on web with Flutter 2.5
 
+## 4.0.0
 
-# 4.0.0
+- Support null safety (Null safety isn't a breaking change and is Backward compatible meaning you can use it with
+  non-null safe code too)
+- Update example code to null safety and add Dark theme support and controller support to indicators in on of the
+  examples and also fix overflow errors.
 
-- Support null safety (Null safety isn't a breaking change and is Backward compatible meaning you can use it with non-null safe code too)
-- Update example code to null safety and add Dark theme support and controller support to indicators in on of the examples and also fix overflow errors. 
+## 3.0.0
 
-# 3.0.0
-
-## Add
+### Add
 
 - Add third argument in `itemBuilder`, allow Hero and infinite scroll to coexist
 
-## Breaking change
+### Breaking change
 
 - `itemBuilder` needs to accept three arguments, instead of two.
 
-# 2.3.4
+## 2.3.4
 
-## Fix
+### Fix
 
-- Rollback PR #222, due to it will break the existing project.
+- Rollback PR ##222, due to it will break the existing project.
 
-# 2.3.3
+## 2.3.3
 
 - Fix code formatting
 
-# 2.3.2
+## 2.3.2
 
-## Fix
+### Fix
 
 - Double pointer down and up will cause a exception
 - Fix `CarouselPageChangedReason`
 
-## Add
+### Add
 
 - Allow Hero and infinite scroll to coexist
 
-# 2.3.1
+## 2.3.1
 
 - Fix code formatting
 
-# 2.3.0
+## 2.3.0
 
-## Fix
+### Fix
 
 - Fixed unresponsiveness to state changes
 
-## Add
+### Add
 
 - Added start/stop autoplay functionality
 - Pause auto play if not current route
 - Add `pageSnapping` option for disable page snapping for the carousel
 
-# 2.2.1
+## 2.2.1
 
-## Fix
+### Fix
 
 - Fixed `carousel_options.dart` and `carousel_controller` not being exported by default.
 
-# 2.2.0
+## 2.2.0
 
-## Add
+### Add
 
 - `disableCenter` option
 
@@ -97,15 +113,16 @@ This option controls whether the carousel slider item should be wrapped in a `Ce
 
 - `enlargeStrategy` option
 
-This option allow user to set which enlarge strategy to enlarge the center slide. Use `CenterPageEnlargeStrategy.height` if you want to improve the performance.
+This option allow user to set which enlarge strategy to enlarge the center slide. Use `CenterPageEnlargeStrategy.height`
+if you want to improve the performance.
 
-## Fix
+### Fix
 
 - Fixed `CarousePageChangedReason.manual` never being emitted
 
-# 2.1.0
+## 2.1.0
 
-## Add
+### Add
 
 - `pauseAutoPlayOnTouch` option
 
@@ -113,7 +130,8 @@ This option controls whether the carousel slider should pause the auto play func
 
 - `pauseAutoPlayOnManualNavigate` option
 
-This option controls whether the carousel slider should pause the auto play function when user is calling controller's method.
+This option controls whether the carousel slider should pause the auto play function when user is calling controller's
+method.
 
 - `pauseAutoPlayInFiniteScroll` option
 
@@ -123,17 +141,17 @@ This option decide the carousel should go to the first item when it reach the la
 
 This option is useful when you want to keep the pageview's position when it was recreated.
 
-## Fix
+### Fix
 
 - Fix `CarouselPageChangedReason` bug
 
-## Other updates
+### Other updates
 
 - Use `Transform.scale` instead of `SizedBox` to wrap the slider item
 
-# 2.0.0
+## 2.0.0
 
-## Breaking change
+### Breaking change
 
 Instead of passing all the options to the `CarouselSlider`, now you'll need to pass these option to `CarouselOptions`:
 
@@ -157,103 +175,102 @@ CarouselSlider(
 )
 ```
 
-## Add
+### Add
 
 - `CarouselController`
 
-Since `v2.0.0`, `carousel_slider` plugin provides a way to pass your own `CaourselController`, and you can use `CaouselController` instance to manually control the carousel's position. For a more detailed example please refer to [example project](example/lib/main.dart).
+Since `v2.0.0`, `carousel_slider` plugin provides a way to pass your own `CaourselController`, and you can
+use `CaouselController` instance to manually control the carousel's position. For a more detailed example please refer
+to [example project](example/lib/main.dart).
 
 - `CarouselPageChangedReason`
 
 Now you can receive a `CarouselPageChangedReason` in `onPageChanged` callback.
 
-## Remove
+### Remove
 
 - `pauseAutoPlayOnTouch`
 
 `pauseAutoPlayOnTouch` option is removed, because it doesn't fix the problem we have. Currently, when we enable the `autoPlay` feature, we can not stop sliding when the user interact with the carousel. This is [a flutter's issue](https://github.com/flutter/flutter/issues/54875).
 
-# 1.4.1
+## 1.4.1
 
-## Fix
+### Fix
 
 - Fix `animateTo()/jumpTo()` with non-zero initialPage
 
-# 1.4.0
+## 1.4.0
 
-## Add
+### Add
 
 - Add on-demand item feature
 
-## Fix
+### Fix
 
 - Fix `setState() called after dispose()` bug
 
-# 1.3.1
+## 1.3.1
 
-## Add
+### Add
 
 - Scroll physics option
 
-## Fix
+### Fix
 
 - onPage indexing bug
 
+## 1.3.0
 
-# 1.3.0
-
-## Deprecation
+### Deprecation
 
 - Remove the deprecated param: `interval`, `autoPlayDuration`, `distortion`, `updateCallback`. Please use the new param.
 
-## Fix
+### Fix
 
--  Fix `enlargeCenterPage` option is not working in `vertical` carousel slider.
+- Fix `enlargeCenterPage` option is not working in `vertical` carousel slider.
 
-# 1.2.0
+## 1.2.0
 
-## Add
+### Add
 
 - Vertical scroll support
 - Enable/disable infinite scroll
 
-# 1.1.0
+## 1.1.0
 
-## Add
+### Add
 
 - Added `pauseAutoPlayOnTouch` option
 - Add documentation
 
-# 1.0.1
+## 1.0.1
 
-## Add
+### Add
 
 - Update doc
 
-# 1.0.0
+## 1.0.0
 
-## Add
+### Add
 
 - Added `distortion` option
 
+## 0.0.6
 
-# 0.0.6
-
-## Fix
+### Fix
 
 - Fix hard coded number
 
-# 0.0.5
+## 0.0.5
 
-## Fix
+### Fix
 
 - Fix `initialPage` bug, fix crash when widget is disposed.
 
-
-# v0.0.2
+## v0.0.2
 
 Remove useless dependencies, add changelog.
 
-# v0.0.1
+## v0.0.1
 
 Initial version.
