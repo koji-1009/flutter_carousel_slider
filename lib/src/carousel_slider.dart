@@ -77,6 +77,8 @@ class CarouselSlider extends StatefulWidget {
 }
 
 class _CarouselSliderState extends State<CarouselSlider> {
+  CarouselOptions get _options => widget.options;
+
   /// [Timer] to handle auto play
   Timer? _timer;
 
@@ -99,15 +101,15 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
     _carouselController = widget.carouselController ?? CarouselController();
     _pageController = PageController(
-      viewportFraction: widget.options.viewportFraction,
-      initialPage: widget.options.initialPage +
-          (widget.options.enableInfiniteScroll ? widget.options.realPage : 0),
+      viewportFraction: _options.viewportFraction,
+      initialPage: _options.initialPage +
+          (_options.enableInfiniteScroll ? _options.realPage : 0),
     );
     _pageController.addListener(() {
       widget.onScrolled?.call(_pageController.page);
     });
 
-    final isNeedResetTimer = widget.options.pauseAutoPlayOnManualNavigate;
+    final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
     _carouselController.setupCallbacks(
       onNextPage: (duration, curve) async {
         if (isNeedResetTimer) {
@@ -142,7 +144,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       onJumpToPage: (page) {
         final index = getRealIndex(
           position: _pageController.page!.toInt(),
-          base: widget.options.realPage - widget.options.initialPage,
+          base: _options.realPage - _options.initialPage,
           length: widget.itemCount,
         );
 
@@ -156,12 +158,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
         }
         final index = getRealIndex(
           position: _pageController.page!.toInt(),
-          base: widget.options.realPage - widget.options.initialPage,
+          base: _options.realPage - _options.initialPage,
           length: widget.itemCount,
         );
         var smallestMovement = page - index;
-        if (widget.options.enableInfiniteScroll &&
-            widget.options.animateToClosest) {
+        if (_options.enableInfiniteScroll && _options.animateToClosest) {
           final distance = (page - index).abs();
           final distanceWithNext = (page + widget.itemCount - index).abs();
           if (distance > distanceWithNext) {
@@ -215,10 +216,10 @@ class _CarouselSliderState extends State<CarouselSlider> {
         requestResumeTimer: () {
           _resumeTimer();
         },
-        options: widget.options,
+        options: _options,
         child: PageView.builder(
-          key: widget.options.pageViewKey,
-          padEnds: widget.options.padEnds,
+          key: _options.pageViewKey,
+          padEnds: _options.padEnds,
           scrollBehavior: ScrollConfiguration.of(context).copyWith(
             scrollbars: false,
             overscroll: false,
@@ -227,18 +228,17 @@ class _CarouselSliderState extends State<CarouselSlider> {
               PointerDeviceKind.mouse,
             },
           ),
-          clipBehavior: widget.options.clipBehavior,
-          physics: widget.options.scrollPhysics,
-          scrollDirection: widget.options.scrollDirection,
-          pageSnapping: widget.options.pageSnapping,
+          clipBehavior: _options.clipBehavior,
+          physics: _options.scrollPhysics,
+          scrollDirection: _options.scrollDirection,
+          pageSnapping: _options.pageSnapping,
           controller: _pageController,
-          reverse: widget.options.reverse,
-          itemCount:
-              widget.options.enableInfiniteScroll ? null : widget.itemCount,
+          reverse: _options.reverse,
+          itemCount: _options.enableInfiniteScroll ? null : widget.itemCount,
           onPageChanged: (index) {
             final currentPage = getRealIndex(
-              position: index + widget.options.initialPage,
-              base: widget.options.realPage,
+              position: index + _options.initialPage,
+              base: _options.realPage,
               length: widget.itemCount,
             );
 
@@ -247,9 +247,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
           itemBuilder: (context, realIndex) {
             final index = getRealIndex(
               position: realIndex,
-              base: widget.options.enableInfiniteScroll
-                  ? widget.options.realPage
-                  : 0,
+              base: _options.enableInfiniteScroll ? _options.realPage : 0,
               length: widget.itemCount,
             );
 
@@ -264,7 +262,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
                 // if `enlargeCenterPage` is true, we must calculate the carousel item's height
                 // to display the visual effect
                 var itemOffset = 0.0;
-                if (widget.options.enlargeCenterPage) {
+                if (_options.enlargeCenterPage) {
                   // pageController.page can only be accessed after the first build,
                   // so in the first build we calculate the item offset manually
                   final position = _pageController.position;
@@ -280,12 +278,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
                     if (previousSavedPosition != null) {
                       itemOffset = previousSavedPosition - realIndex;
                     } else {
-                      itemOffset = (widget.options.realPage - realIndex) * 1.0;
+                      itemOffset = (_options.realPage - realIndex) * 1.0;
                     }
                   }
 
-                  final enlargeFactor =
-                      widget.options.enlargeFactor.clamp(0.0, 1.0);
+                  final enlargeFactor = _options.enlargeFactor.clamp(0.0, 1.0);
                   final distortionRatio =
                       (1.0 - (itemOffset.abs() * enlargeFactor))
                           .clamp(0.0, 1.0)
@@ -294,11 +291,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
                 }
 
                 final (enlargeHeight, enlargeWidth) =
-                    switch (widget.options.scrollDirection) {
+                    switch (_options.scrollDirection) {
                   Axis.horizontal => (
-                      (widget.options.height ??
+                      (_options.height ??
                               constraints.maxWidth *
-                                  (1 / widget.options.aspectRatio)) *
+                                  (1 / _options.aspectRatio)) *
                           scale,
                       null,
                     ),
@@ -309,8 +306,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
                 };
 
                 return _EnlargeItem(
-                  options: widget.options,
-                  strategyOption: switch (widget.options.enlargeStrategy) {
+                  options: _options,
+                  strategyOption: switch (_options.enlargeStrategy) {
                     CenterPageEnlargeStrategy.height => _Height(
                         height: enlargeHeight,
                       ),
@@ -342,11 +339,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
   }
 
   void _resumeTimer() {
-    if (!widget.options.autoPlay || _timer != null) {
+    if (!_options.autoPlay || _timer != null) {
       return;
     }
 
-    _timer = Timer.periodic(widget.options.autoPlayInterval, (_) async {
+    _timer = Timer.periodic(_options.autoPlayInterval, (_) async {
       if (!mounted) {
         _clearTimer();
         return;
@@ -362,8 +359,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
       var nextPage = _pageController.page!.round() + 1;
       final itemCount = widget.itemCount;
-      if (nextPage >= itemCount && !widget.options.enableInfiniteScroll) {
-        if (widget.options.pauseAutoPlayInFiniteScroll) {
+      if (nextPage >= itemCount && !_options.enableInfiniteScroll) {
+        if (_options.pauseAutoPlayInFiniteScroll) {
           _clearTimer();
           return;
         }
@@ -372,16 +369,15 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
       await _pageController.animateToPage(
         nextPage,
-        duration: widget.options.autoPlayAnimationDuration,
-        curve: widget.options.autoPlayCurve,
+        duration: _options.autoPlayAnimationDuration,
+        curve: _options.autoPlayCurve,
       );
       _mode = previousReason;
     });
   }
 
   void _handleAutoPlay() {
-    final autoPlayEnabled = widget.options.autoPlay;
-    if (!autoPlayEnabled) {
+    if (!_options.autoPlay) {
       _clearTimer();
       return;
     }
