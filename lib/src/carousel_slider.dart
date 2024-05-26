@@ -208,7 +208,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final itemHeight = _options.height ??
-            constraints.maxWidth * (1 / _options.aspectRatio);
+            constraints.maxWidth * (1.0 / _options.aspectRatio);
         final itemWidth = constraints.maxWidth;
 
         return _GestureHandler(
@@ -284,7 +284,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
                       if (previousSavedPosition != null) {
                         itemOffset = previousSavedPosition - realIndex;
                       } else {
-                        itemOffset = (_options.realPage - realIndex) * 1.0;
+                        itemOffset = (_options.realPage - realIndex).toDouble();
                       }
                     }
 
@@ -292,8 +292,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
                         _options.enlargeFactor.clamp(0.0, 1.0);
                     final distortionRatio =
                         (1.0 - (itemOffset.abs() * enlargeFactor))
-                            .clamp(0.0, 1.0)
-                            .toDouble();
+                            .clamp(0.0, 1.0);
                     scale = Curves.easeOut.transform(distortionRatio);
                   }
 
