@@ -92,6 +92,22 @@ class _CarouselSliderState extends State<CarouselSlider> {
   late PageController _pageController;
 
   @override
+  void didUpdateWidget(covariant CarouselSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.carouselController != widget.carouselController) {
+      _carouselController.dispose();
+      _setupCarouselController();
+    }
+
+    if (oldWidget.options != widget.options) {
+      _pageController.dispose();
+      _setupPageController();
+    }
+
+    _handleAutoPlay();
+  }
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -99,98 +115,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
       setState(() {});
     });
 
-    _carouselController = widget.carouselController ?? CarouselController();
-    _pageController = PageController(
-      viewportFraction: _options.viewportFraction,
-      initialPage: _options.initialPage +
-          (_options.enableInfiniteScroll ? _options.realPage : 0),
-    );
-    _pageController.addListener(() {
-      widget.onScrolled?.call(_pageController.page);
-    });
-
-    final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
-    _carouselController.setupCallbacks(
-      onNextPage: (duration, curve) async {
-        if (isNeedResetTimer) {
-          _clearTimer();
-        }
-
-        _mode = CarouselPageChangedReason.controller;
-        await _pageController.nextPage(
-          duration: duration,
-          curve: curve,
-        );
-
-        if (isNeedResetTimer) {
-          _resumeTimer();
-        }
-      },
-      onPreviousPage: (duration, curve) async {
-        if (isNeedResetTimer) {
-          _clearTimer();
-        }
-
-        _mode = CarouselPageChangedReason.controller;
-        await _pageController.previousPage(
-          duration: duration,
-          curve: curve,
-        );
-
-        if (isNeedResetTimer) {
-          _resumeTimer();
-        }
-      },
-      onJumpToPage: (page) {
-        final index = getRealIndex(
-          position: _pageController.page!.toInt(),
-          base: _options.realPage - _options.initialPage,
-          length: widget.itemCount,
-        );
-
-        _mode = CarouselPageChangedReason.controller;
-        final pageToJump = _pageController.page!.toInt() + page - index;
-        _pageController.jumpToPage(pageToJump);
-      },
-      onAnimateToPage: (page, duration, curve) async {
-        if (isNeedResetTimer) {
-          _clearTimer();
-        }
-        final index = getRealIndex(
-          position: _pageController.page!.toInt(),
-          base: _options.realPage - _options.initialPage,
-          length: widget.itemCount,
-        );
-        var smallestMovement = page - index;
-        if (_options.enableInfiniteScroll && _options.animateToClosest) {
-          final distance = (page - index).abs();
-          final distanceWithNext = (page + widget.itemCount - index).abs();
-          if (distance > distanceWithNext) {
-            smallestMovement = page + widget.itemCount - index;
-          } else if (distance > distanceWithNext) {
-            smallestMovement = page - widget.itemCount - index;
-          }
-        }
-
-        _mode = CarouselPageChangedReason.controller;
-        await _pageController.animateToPage(
-          _pageController.page!.toInt() + smallestMovement,
-          duration: duration,
-          curve: curve,
-        );
-
-        if (isNeedResetTimer) {
-          _resumeTimer();
-        }
-      },
-      onStartAutoPlay: () {
-        _resumeTimer();
-      },
-      onStopAutoPlay: () {
-        _clearTimer();
-      },
-    );
-
+    _setupCarouselController();
+    _setupPageController();
     _handleAutoPlay();
   }
 
@@ -331,6 +257,103 @@ class _CarouselSliderState extends State<CarouselSlider> {
             },
           ),
         );
+      },
+    );
+  }
+
+  void _setupCarouselController() {
+    _carouselController = widget.carouselController ?? CarouselController();
+  }
+
+  void _setupPageController() {
+    _pageController = PageController(
+      viewportFraction: _options.viewportFraction,
+      initialPage: _options.initialPage +
+          (_options.enableInfiniteScroll ? _options.realPage : 0),
+    );
+    _pageController.addListener(() {
+      widget.onScrolled?.call(_pageController.page);
+    });
+
+    final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
+    _carouselController.setupCallbacks(
+      onNextPage: (duration, curve) async {
+        if (isNeedResetTimer) {
+          _clearTimer();
+        }
+
+        _mode = CarouselPageChangedReason.controller;
+        await _pageController.nextPage(
+          duration: duration,
+          curve: curve,
+        );
+
+        if (isNeedResetTimer) {
+          _resumeTimer();
+        }
+      },
+      onPreviousPage: (duration, curve) async {
+        if (isNeedResetTimer) {
+          _clearTimer();
+        }
+
+        _mode = CarouselPageChangedReason.controller;
+        await _pageController.previousPage(
+          duration: duration,
+          curve: curve,
+        );
+
+        if (isNeedResetTimer) {
+          _resumeTimer();
+        }
+      },
+      onJumpToPage: (page) {
+        final index = getRealIndex(
+          position: _pageController.page!.toInt(),
+          base: _options.realPage - _options.initialPage,
+          length: widget.itemCount,
+        );
+
+        _mode = CarouselPageChangedReason.controller;
+        final pageToJump = _pageController.page!.toInt() + page - index;
+        _pageController.jumpToPage(pageToJump);
+      },
+      onAnimateToPage: (page, duration, curve) async {
+        if (isNeedResetTimer) {
+          _clearTimer();
+        }
+        final index = getRealIndex(
+          position: _pageController.page!.toInt(),
+          base: _options.realPage - _options.initialPage,
+          length: widget.itemCount,
+        );
+        var smallestMovement = page - index;
+        if (_options.enableInfiniteScroll && _options.animateToClosest) {
+          final distance = (page - index).abs();
+          final distanceWithNext = (page + widget.itemCount - index).abs();
+          if (distance > distanceWithNext) {
+            smallestMovement = page + widget.itemCount - index;
+          } else if (distance > distanceWithNext) {
+            smallestMovement = page - widget.itemCount - index;
+          }
+        }
+
+        _mode = CarouselPageChangedReason.controller;
+        await _pageController.animateToPage(
+          _pageController.page!.toInt() + smallestMovement,
+          duration: duration,
+          curve: curve,
+        );
+
+        if (isNeedResetTimer) {
+          _resumeTimer();
+        }
+      },
+      onStartAutoPlay: () {
+        _resumeTimer();
+      },
+      onStopAutoPlay: () {
+        _clearTimer();
       },
     );
   }
