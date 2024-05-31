@@ -1,3 +1,8 @@
+## 5.0.1
+
+* Support equatability for `CarouselOptions`
+* Fix `didUpdateWidget` for `CarouselSlider`
+
 ## 5.0.0
 
 Forked and renamed the library.
