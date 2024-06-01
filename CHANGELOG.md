@@ -1,3 +1,7 @@
+## 5.0.2
+
+* Fix `CarouselOptions.initialPage` update issue
+
 ## 5.0.1
 
 * Support equatability for `CarouselOptions`
