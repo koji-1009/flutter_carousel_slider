@@ -77,7 +77,17 @@ class CarouselSlider extends StatefulWidget {
 }
 
 class _CarouselSliderState extends State<CarouselSlider> {
+  /// Default initial offset for PageView in virtual infinite scroll.
+  static const _virtualOffset = 10000;
+
+  /// [CarouselOptions] to determine the behavior of the carousel.
   CarouselOptions get _options => widget.options;
+
+  /// Initial offset for PageView.
+  int get _initialOffset => _options.enableInfiniteScroll ? _virtualOffset : 0;
+
+  /// Initial position for PageView.
+  int get _initialPosition => _options.initialPage + _initialOffset;
 
   /// [Timer] to handle auto play
   Timer? _timer;
@@ -100,8 +110,21 @@ class _CarouselSliderState extends State<CarouselSlider> {
     }
 
     if (oldWidget.options != widget.options) {
+      final isUpdateEnableInfiniteScroll =
+          oldWidget.options.enableInfiniteScroll !=
+              widget.options.enableInfiniteScroll;
+      final isUpdateInitialPage =
+          oldWidget.options.initialPage != widget.options.initialPage;
+      final initialPage = (isUpdateEnableInfiniteScroll || isUpdateInitialPage)
+          ? _initialPosition
+          : _pageController.page?.toInt() ?? 0;
       _pageController.dispose();
-      _setupPageController();
+      _setupPageController(initialPage);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Jump to the initial page after the first build
+        _pageController.jumpToPage(initialPage);
+      });
     }
 
     _handleAutoPlay();
@@ -116,7 +139,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
     });
 
     _setupCarouselController();
-    _setupPageController();
+    _setupPageController(_initialPosition);
     _handleAutoPlay();
   }
 
@@ -169,7 +192,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
             onPageChanged: (index) {
               final currentPage = getRealIndex(
                 position: index + _options.initialPage,
-                base: _options.realPage,
+                base: _virtualOffset,
                 length: widget.itemCount,
               );
 
@@ -178,7 +201,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
             itemBuilder: (context, realIndex) {
               final index = getRealIndex(
                 position: realIndex,
-                base: _options.enableInfiniteScroll ? _options.realPage : 0,
+                base: _initialOffset,
                 length: widget.itemCount,
               );
 
@@ -210,7 +233,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
                       if (previousSavedPosition != null) {
                         itemOffset = previousSavedPosition - realIndex;
                       } else {
-                        itemOffset = (_options.realPage - realIndex).toDouble();
+                        itemOffset = (_virtualOffset - realIndex).toDouble();
                       }
                     }
 
@@ -265,11 +288,10 @@ class _CarouselSliderState extends State<CarouselSlider> {
     _carouselController = widget.carouselController ?? CarouselController();
   }
 
-  void _setupPageController() {
+  void _setupPageController(int initialPage) {
     _pageController = PageController(
       viewportFraction: _options.viewportFraction,
-      initialPage: _options.initialPage +
-          (_options.enableInfiniteScroll ? _options.realPage : 0),
+      initialPage: initialPage,
     );
     _pageController.addListener(() {
       widget.onScrolled?.call(_pageController.page);
@@ -310,7 +332,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       onJumpToPage: (page) {
         final index = getRealIndex(
           position: _pageController.page!.toInt(),
-          base: _options.realPage - _options.initialPage,
+          base: _virtualOffset - _options.initialPage,
           length: widget.itemCount,
         );
 
@@ -324,7 +346,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
         }
         final index = getRealIndex(
           position: _pageController.page!.toInt(),
-          base: _options.realPage - _options.initialPage,
+          base: _virtualOffset - _options.initialPage,
           length: widget.itemCount,
         );
         var smallestMovement = page - index;

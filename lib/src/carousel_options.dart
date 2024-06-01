@@ -26,7 +26,6 @@ class CarouselOptions with EquatableMixin {
     this.aspectRatio = 16 / 9,
     this.viewportFraction = 0.8,
     this.initialPage = 0,
-    this.realPage = 1000,
     this.enableInfiniteScroll = true,
     this.animateToClosest = true,
     this.reverse = false,
@@ -67,13 +66,6 @@ class CarouselOptions with EquatableMixin {
   ///
   /// Defaults to 0.
   final int initialPage;
-
-  /// The actual index of the [PageView].
-  ///
-  /// This value can be ignored unless you know the carousel will be scrolled
-  /// backwards more then 10000 pages.
-  /// Defaults to 10000 to simulate infinite backwards scrolling.
-  final int realPage;
 
   /// Determines if carousel should loop infinitely or be limited to item length.
   ///
@@ -189,7 +181,6 @@ class CarouselOptions with EquatableMixin {
         aspectRatio,
         viewportFraction,
         initialPage,
-        realPage,
         enableInfiniteScroll,
         animateToClosest,
         reverse,
