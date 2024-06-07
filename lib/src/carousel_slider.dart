@@ -190,16 +190,16 @@ class _CarouselSliderState extends State<CarouselSlider> {
             reverse: _options.reverse,
             itemCount: _options.enableInfiniteScroll ? null : widget.itemCount,
             onPageChanged: (index) {
-              final currentPage = getRealIndex(
+              final currentPage = getIndexInLength(
                 position: index + _options.initialPage,
-                base: _virtualOffset,
+                base: _initialPosition,
                 length: widget.itemCount,
               );
 
               widget.onPageChanged?.call(currentPage, _mode);
             },
             itemBuilder: (context, realIndex) {
-              final index = getRealIndex(
+              final index = getIndexInLength(
                 position: realIndex,
                 base: _initialOffset,
                 length: widget.itemCount,
@@ -233,7 +233,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
                       if (previousSavedPosition != null) {
                         itemOffset = previousSavedPosition - realIndex;
                       } else {
-                        itemOffset = (_virtualOffset - realIndex).toDouble();
+                        itemOffset = (realIndex - _initialOffset).toDouble();
                       }
                     }
 
@@ -330,9 +330,9 @@ class _CarouselSliderState extends State<CarouselSlider> {
         }
       },
       onJumpToPage: (page) {
-        final index = getRealIndex(
+        final index = getIndexInLength(
           position: _pageController.page!.toInt(),
-          base: _virtualOffset - _options.initialPage,
+          base: _initialOffset,
           length: widget.itemCount,
         );
 
@@ -344,9 +344,9 @@ class _CarouselSliderState extends State<CarouselSlider> {
         if (isNeedResetTimer) {
           _clearTimer();
         }
-        final index = getRealIndex(
+        final index = getIndexInLength(
           position: _pageController.page!.toInt(),
-          base: _virtualOffset - _options.initialPage,
+          base: _initialOffset,
           length: widget.itemCount,
         );
         var smallestMovement = page - index;
