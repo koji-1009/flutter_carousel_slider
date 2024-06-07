@@ -1,3 +1,7 @@
+## 5.0.3
+
+* Fix position in callback when infinite scroll is disabled
+
 ## 5.0.2
 
 * Fix `CarouselOptions.initialPage` update issue
