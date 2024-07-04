@@ -32047,7 +32047,7 @@ s.n0()}}
 A.a_f.prototype={
 $1(a){var s=this.a.w
 s===$&&A.a()
-s.a1a(this.b)},
+if(s.f.length!==0)s.a1a(this.b)},
 $S:2}
 A.a_h.prototype={
 $1(a){this.a.aB(new A.a_g())},
