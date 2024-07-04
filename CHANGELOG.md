@@ -1,3 +1,7 @@
+## 5.0.4
+
+* Fix layout error when the widget is hide`didUpdateWidget`
+
 ## 5.0.3
 
 * Fix position in callback when infinite scroll is disabled
