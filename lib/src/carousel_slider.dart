@@ -125,8 +125,12 @@ class _CarouselSliderState extends State<CarouselSlider> {
       _setupPageController(initialPage);
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Jump to the initial page after the first build
-        _pageController.jumpToPage(initialPage);
+        // The position is determined at the time of drawing,
+        // so consider the case where there is no position
+        if (_pageController.hasClients) {
+          // Jump to the initial page after the first build
+          _pageController.jumpToPage(initialPage);
+        }
       });
     }
 
