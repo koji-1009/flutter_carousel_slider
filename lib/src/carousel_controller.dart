@@ -18,9 +18,9 @@ typedef AnimateToPageCallback = Future<void> Function(
 );
 
 /// Controller to operate the [CarouselSlider]. It interacts with the widget through callbacks.
-class CarouselController {
-  /// Creates a new [CarouselController].
-  CarouselController();
+class CarouselControllerX {
+  /// Creates a new [CarouselControllerX].
+  CarouselControllerX();
 
   PageChangeCallback? _onNextPageCallback;
   PageChangeCallback? _onPreviousPageCallback;

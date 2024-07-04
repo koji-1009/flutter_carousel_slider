@@ -9,7 +9,7 @@ enum CarouselPageChangedReason {
   /// The page change was triggered by user gesture.
   manual,
 
-  /// The page change was triggered by a call to [CarouselController].
+  /// The page change was triggered by a call to [CarouselControllerX].
   controller,
 }
 

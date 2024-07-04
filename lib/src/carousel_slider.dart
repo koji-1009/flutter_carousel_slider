@@ -63,8 +63,8 @@ class CarouselSlider extends StatefulWidget {
   /// [CarouselOptions] to customize the carousel widget.
   final CarouselOptions options;
 
-  /// A [CarouselController], used to control the carousel.
-  final CarouselController? carouselController;
+  /// A [CarouselControllerX], used to control the carousel.
+  final CarouselControllerX? carouselController;
 
   /// Called whenever the page in the center of the viewport changes.
   final CarouselPageChangedCallback? onPageChanged;
@@ -98,8 +98,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
   /// [CarouselPageChangedReason] to determine the reason for page change
   CarouselPageChangedReason _mode = CarouselPageChangedReason.controller;
 
-  /// [CarouselController] to control the carousel
-  late CarouselController _carouselController;
+  /// [CarouselControllerX] to control the carousel
+  late CarouselControllerX _carouselController;
 
   /// [PageController] to control the [PageView]
   late PageController _pageController;
@@ -109,7 +109,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.carouselController != widget.carouselController) {
       _carouselController.dispose();
-      _setupCarouselController();
+      _setupCarouselControllerX();
     }
 
     if (oldWidget.options != widget.options) {
@@ -145,7 +145,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       setState(() {});
     });
 
-    _setupCarouselController();
+    _setupCarouselControllerX();
     _setupPageController(_initialPosition);
     _handleAutoPlay();
   }
@@ -291,8 +291,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
     );
   }
 
-  void _setupCarouselController() {
-    _carouselController = widget.carouselController ?? CarouselController();
+  void _setupCarouselControllerX() {
+    _carouselController = widget.carouselController ?? CarouselControllerX();
   }
 
   void _setupPageController(int initialPage) {
