@@ -89,6 +89,9 @@ class _CarouselSliderState extends State<CarouselSlider> {
   /// Initial position for PageView.
   int get _initialPosition => _options.initialPage + _initialOffset;
 
+  /// Current page of the carousel.
+  double? _currentPage;
+
   /// [Timer] to handle auto play
   Timer? _timer;
 
@@ -117,7 +120,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
           oldWidget.options.initialPage != widget.options.initialPage;
       final initialPage = (isUpdateEnableInfiniteScroll || isUpdateInitialPage)
           ? _initialPosition
-          : _pageController.page?.toInt() ?? 0;
+          : _currentPage?.toInt() ?? 0;
       _pageController.dispose();
       _setupPageController(initialPage);
 
@@ -221,7 +224,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
                     // so in the first build we calculate the item offset manually
                     final position = _pageController.position;
                     if (position.hasPixels && position.hasContentDimensions) {
-                      final page = _pageController.page;
+                      final page = _currentPage;
                       if (page != null) {
                         itemOffset = page - realIndex;
                       }
@@ -294,7 +297,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
       initialPage: initialPage,
     );
     _pageController.addListener(() {
-      widget.onScrolled?.call(_pageController.page);
+      _currentPage = _pageController.page;
+      widget.onScrolled?.call(_currentPage);
     });
 
     final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
@@ -331,13 +335,13 @@ class _CarouselSliderState extends State<CarouselSlider> {
       },
       onJumpToPage: (page) {
         final index = getIndexInLength(
-          position: _pageController.page!.toInt(),
+          position: _currentPage!.toInt(),
           base: _initialOffset,
           length: widget.itemCount,
         );
 
         _mode = CarouselPageChangedReason.controller;
-        final pageToJump = _pageController.page!.toInt() + page - index;
+        final pageToJump = _currentPage!.toInt() + page - index;
         _pageController.jumpToPage(pageToJump);
       },
       onAnimateToPage: (page, duration, curve) async {
@@ -345,7 +349,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
           _clearTimer();
         }
         final index = getIndexInLength(
-          position: _pageController.page!.toInt(),
+          position: _currentPage!.toInt(),
           base: _initialOffset,
           length: widget.itemCount,
         );
@@ -362,7 +366,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
         _mode = CarouselPageChangedReason.controller;
         await _pageController.animateToPage(
-          _pageController.page!.toInt() + smallestMovement,
+          _currentPage!.toInt() + smallestMovement,
           duration: duration,
           curve: curve,
         );
@@ -406,7 +410,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       final previousReason = _mode;
       _mode = CarouselPageChangedReason.timed;
 
-      var nextPage = _pageController.page!.round() + 1;
+      var nextPage = _currentPage!.round() + 1;
       final itemCount = widget.itemCount;
       if (nextPage >= itemCount && !_options.enableInfiniteScroll) {
         if (_options.pauseAutoPlayInFiniteScroll) {
