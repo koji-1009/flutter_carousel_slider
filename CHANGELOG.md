@@ -1,3 +1,7 @@
+## 5.0.5
+
+* Fix assertion error when `PageController.jumpToPage` is called
+
 ## 5.0.4
 
 * Fix layout error when the widget is hide`didUpdateWidget`
