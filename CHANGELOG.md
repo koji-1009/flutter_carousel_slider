@@ -1,3 +1,7 @@
+## 6.0.0
+
+* Rename `CarouselController` to `CarouselControllerX`
+
 ## 5.0.5
 
 * Fix assertion error when `PageController.jumpToPage` is called
