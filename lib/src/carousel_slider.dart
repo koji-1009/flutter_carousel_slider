@@ -142,6 +142,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // After the first build method, request a redraw
+      if (!mounted) return;
       setState(() {});
     });
 
