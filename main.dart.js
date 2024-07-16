@@ -32050,7 +32050,9 @@ s===$&&A.a()
 if(s.f.length!==0)s.a1a(this.b)},
 $S:2}
 A.a_h.prototype={
-$1(a){this.a.aB(new A.a_g())},
+$1(a){var s=this.a
+if(s.c==null)return
+s.aB(new A.a_g())},
 $S:2}
 A.a_g.prototype={
 $0(){},
