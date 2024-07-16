@@ -1,3 +1,7 @@
+## 6.0.1
+
+* Add a `mounted` check before the `setState` call
+
 ## 6.0.0
 
 * Rename `CarouselController` to `CarouselControllerX`
