@@ -301,6 +301,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       viewportFraction: _options.viewportFraction,
       initialPage: initialPage,
     );
+    _currentPage = initialPage.toDouble();
     _pageController.addListener(() {
       _currentPage = _pageController.page;
       widget.onScrolled?.call(_currentPage);
