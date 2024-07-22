@@ -1,3 +1,7 @@
+## 6.0.2
+
+* Fix `_currentPage` nullable issue
+
 ## 6.0.1
 
 * Add a `mounted` check before the `setState` call
