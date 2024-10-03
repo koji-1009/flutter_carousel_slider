@@ -1,3 +1,7 @@
+## 6.0.3
+
+* Fix current page issue when the device is rotated
+
 ## 6.0.2
 
 * Fix `_currentPage` nullable issue
