@@ -227,20 +227,39 @@ class _CarouselSliderState extends State<CarouselSlider> {
                   // to display the visual effect
                   var itemOffset = 0.0;
                   if (_options.enlargeCenterPage) {
-                    // pageController.page can only be accessed after the first build,
+                    // `_pageController.page` can only be accessed after the first build,
                     // so in the first build we calculate the item offset manually
                     final position = _pageController.position;
                     if (position.hasPixels && position.hasContentDimensions) {
+                      // This case is after the first build
+                      // So, we can access the `_currentPageViewPage`
                       itemOffset =
                           (_currentPageViewPage - realIndex).toDouble();
                     } else {
+                      // This case is before the first build
                       final storageContext = position.context.storageContext;
                       final previousSavedPosition =
                           PageStorage.of(storageContext)
                               .readState(storageContext) as double?;
                       if (previousSavedPosition != null) {
+                        // Restore the previous position
+                        _currentPageViewPage = previousSavedPosition.toInt();
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          // Notify page is restored
+                          widget.onPageChanged?.call(
+                            getIndexInLength(
+                              position: previousSavedPosition.toInt(),
+                              base: _initialOffset,
+                              length: widget.itemCount,
+                            ),
+                            CarouselPageChangedReason.restore,
+                          );
+                        });
+
                         itemOffset = previousSavedPosition - realIndex;
                       } else {
+                        // `_currentPageViewPage` is not set yet
+                        // So, we calculate the item offset manually
                         itemOffset = (realIndex - _initialOffset).toDouble();
                       }
                     }

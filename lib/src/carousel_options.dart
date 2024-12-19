@@ -11,6 +11,9 @@ enum CarouselPageChangedReason {
 
   /// The page change was triggered by a call to [CarouselControllerX].
   controller,
+
+  /// The page change was triggered by restore page with [PageStorageKey].
+  restore,
 }
 
 /// Strategy for enlarging effect.
@@ -150,7 +153,7 @@ class CarouselOptions with EquatableMixin {
   final bool pauseAutoPlayInFiniteScroll;
 
   /// Pass a [PageStorageKey] if you want to keep the PageView's position when it was recreated.
-  final PageStorageKey? pageViewKey;
+  final PageStorageKey<Object>? pageViewKey;
 
   /// Use [enlargeStrategy] to determine which method to enlarge the center page.
   final CenterPageEnlargeStrategy enlargeStrategy;
