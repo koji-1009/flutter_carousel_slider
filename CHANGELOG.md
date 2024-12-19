@@ -1,3 +1,7 @@
+## 6.0.4
+
+* Fixed restore process with PageStorageKey
+
 ## 6.0.3
 
 * Fix current page issue when the device is rotated
