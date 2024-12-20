@@ -1,3 +1,7 @@
+## 6.0.5
+
+* Notify position regardless of enlargeCenterPage value
+
 ## 6.0.4
 
 * Fixed restore process with PageStorageKey

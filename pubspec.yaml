@@ -1,7 +1,7 @@
 name: carousel_slider_x
 description: A carousel slider widget, support infinite scroll and auto play, enlarge mode.
 repository: https://github.com/koji-1009/flutter_carousel_slider
-version: 6.0.4
+version: 6.0.5
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
