@@ -144,6 +144,21 @@ class _CarouselSliderState extends State<CarouselSlider> {
       // After the first build method, request a redraw
       if (!mounted) return;
       setState(() {});
+
+      final position = _pageController.position;
+      final storageContext = position.context.storageContext;
+      final previousSavedPosition =
+          PageStorage.of(storageContext).readState(storageContext) as double?;
+      if (previousSavedPosition != null) {
+        widget.onPageChanged?.call(
+          getIndexInLength(
+            position: _currentPageViewPage,
+            base: _initialOffset,
+            length: widget.itemCount,
+          ),
+          CarouselPageChangedReason.restore,
+        );
+      }
     });
 
     _setupCarouselControllerX();
@@ -244,17 +259,6 @@ class _CarouselSliderState extends State<CarouselSlider> {
                       if (previousSavedPosition != null) {
                         // Restore the previous position
                         _currentPageViewPage = previousSavedPosition.toInt();
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          // Notify page is restored
-                          widget.onPageChanged?.call(
-                            getIndexInLength(
-                              position: previousSavedPosition.toInt(),
-                              base: _initialOffset,
-                              length: widget.itemCount,
-                            ),
-                            CarouselPageChangedReason.restore,
-                          );
-                        });
 
                         itemOffset = previousSavedPosition - realIndex;
                       } else {
