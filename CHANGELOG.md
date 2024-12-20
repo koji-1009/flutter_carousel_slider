@@ -1,3 +1,7 @@
+## 6.0.6
+
+* Fix initial position when `enlargeCenterPage` is `false`
+
 ## 6.0.5
 
 * Notify position regardless of enlargeCenterPage value
