@@ -237,37 +237,30 @@ class _CarouselSliderState extends State<CarouselSlider> {
                 animation: _pageController,
                 child: child,
                 builder: (context, child) {
+                  // `_pageController.page` can only be accessed after the first build,
+                  // so in the first build we calculate the item offset manually
+                  final position = _pageController.position;
+                  if (position.hasPixels && position.hasContentDimensions) {
+                    // This case is after the first build
+                    // So, we can access the `_currentPageViewPage`
+                  } else {
+                    // This case is before the first build
+                    final storageContext = position.context.storageContext;
+                    final previousSavedPosition = PageStorage.of(storageContext)
+                        .readState(storageContext) as double?;
+                    if (previousSavedPosition != null) {
+                      // Restore the previous position
+                      _currentPageViewPage = previousSavedPosition.toInt();
+                    } else {
+                      _currentPageViewPage = realIndex;
+                    }
+                  }
+
                   var scale = 1.0;
                   // if `enlargeCenterPage` is true, we must calculate the carousel item's height
                   // to display the visual effect
-                  var itemOffset = 0.0;
+                  final itemOffset = _currentPageViewPage - realIndex;
                   if (_options.enlargeCenterPage) {
-                    // `_pageController.page` can only be accessed after the first build,
-                    // so in the first build we calculate the item offset manually
-                    final position = _pageController.position;
-                    if (position.hasPixels && position.hasContentDimensions) {
-                      // This case is after the first build
-                      // So, we can access the `_currentPageViewPage`
-                      itemOffset =
-                          (_currentPageViewPage - realIndex).toDouble();
-                    } else {
-                      // This case is before the first build
-                      final storageContext = position.context.storageContext;
-                      final previousSavedPosition =
-                          PageStorage.of(storageContext)
-                              .readState(storageContext) as double?;
-                      if (previousSavedPosition != null) {
-                        // Restore the previous position
-                        _currentPageViewPage = previousSavedPosition.toInt();
-
-                        itemOffset = previousSavedPosition - realIndex;
-                      } else {
-                        // `_currentPageViewPage` is not set yet
-                        // So, we calculate the item offset manually
-                        itemOffset = (realIndex - _initialOffset).toDouble();
-                      }
-                    }
-
                     final enlargeFactor =
                         _options.enlargeFactor.clamp(0.0, 1.0);
                     final distortionRatio =
@@ -602,7 +595,7 @@ class _Zoom extends _StrategyOption {
   });
 
   final double scale;
-  final double itemOffset;
+  final int itemOffset;
 }
 
 class _Scale extends _StrategyOption {
