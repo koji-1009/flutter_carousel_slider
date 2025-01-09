@@ -1,3 +1,7 @@
+## 6.0.7
+
+* Fix animation when `enlargeCenterPage` is `true` 
+
 ## 6.0.6
 
 * Fix initial position when `enlargeCenterPage` is `false`
