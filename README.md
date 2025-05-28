@@ -81,7 +81,6 @@ CarouselSlider(
       autoPlayCurve: Curves.fastOutSlowIn,
       enlargeCenterPage: true,
       enlargeFactor: 0.3,
-      onPageChanged: callbackFunction,
       scrollDirection: Axis.horizontal,
    )
  )
