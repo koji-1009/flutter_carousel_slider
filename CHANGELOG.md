@@ -1,3 +1,8 @@
+## 6.1.0
+
+* Fix initial page position issue.
+* Add unit tests.
+
 ## 6.0.7
 
 * Fix animation when `enlargeCenterPage` is `true` 
