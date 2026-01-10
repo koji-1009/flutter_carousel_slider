@@ -496,4 +496,52 @@ void main() {
       expect(find.text('1'), findsOneWidget);
     });
   });
+
+  group('Regression Tests', () {
+    testWidgets('enlargeCenterPage scales down side items on initial render',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                viewportFraction: 0.7,
+                enlargeCenterPage: true,
+                initialPage: 1,
+                enableInfiniteScroll: false,
+              ),
+              items: const [
+                Text('Item 0'),
+                Text('Item 1'),
+                Text('Item 2'),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      // Item 1 is center (initialPage). Should be scale 1.0
+      // Item 0 is left side. Should be scale < 1.0
+
+      // Find Transform widgets wrapping the Texts
+      final item0TransformFinder = find
+          .ancestor(of: find.text('Item 0'), matching: find.byType(Transform))
+          .first;
+
+      final item1TransformFinder = find
+          .ancestor(of: find.text('Item 1'), matching: find.byType(Transform))
+          .first;
+
+      final transform0 = tester.widget<Transform>(item0TransformFinder);
+      final transform1 = tester.widget<Transform>(item1TransformFinder);
+
+      // Verify scaling using Matrix4 diagonal element (index 0 for x-scale)
+      final scale0 = transform0.transform.storage[0];
+      final scale1 = transform1.transform.storage[0];
+
+      expect(scale1, closeTo(1.0, 0.01),
+          reason: 'Center item should be full scale');
+      expect(scale0, lessThan(0.95), reason: 'Side item should be scaled down');
+    });
+  });
 }
