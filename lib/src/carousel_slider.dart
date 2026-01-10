@@ -239,27 +239,27 @@ class _CarouselSliderState extends State<CarouselSlider> {
                 builder: (context, child) {
                   // `_pageController.page` can only be accessed after the first build,
                   // so in the first build we calculate the item offset manually
-                  final position = _pageController.position;
-                  if (position.hasPixels && position.hasContentDimensions) {
-                    // This case is after the first build
-                    // So, we can access the `_currentPageViewPage`
+                  final double currentPageValue;
+                  if (_pageController.hasClients &&
+                      _pageController.position.hasPixels &&
+                      _pageController.position.hasContentDimensions) {
+                    currentPageValue = _pageController.page ?? _currentPage;
                   } else {
-                    // This case is before the first build
-                    final storageContext = position.context.storageContext;
+                    // This case is before the first build or before layout
+                    final storageContext = context;
                     final previousSavedPosition = PageStorage.of(storageContext)
                         .readState(storageContext) as double?;
                     if (previousSavedPosition != null) {
-                      // Restore the previous position
-                      _currentPage = previousSavedPosition;
+                      currentPageValue = previousSavedPosition;
                     } else {
-                      _currentPage = realIndex.toDouble();
+                      currentPageValue = _currentPage;
                     }
                   }
 
                   var scale = 1.0;
                   // if `enlargeCenterPage` is true, we must calculate the carousel item's height
                   // to display the visual effect
-                  final itemOffset = _currentPage - realIndex;
+                  final itemOffset = currentPageValue - realIndex;
                   if (_options.enlargeCenterPage) {
                     final enlargeFactor =
                         _options.enlargeFactor.clamp(0.0, 1.0);
