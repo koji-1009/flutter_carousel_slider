@@ -14,7 +14,6 @@ int getIndexInLength({
   required int base,
   required int length,
 }) {
-  assert(length > 0, 'Length must be greater than 0');
   if (length == 0) return 0;
 
   final offset = position - base;

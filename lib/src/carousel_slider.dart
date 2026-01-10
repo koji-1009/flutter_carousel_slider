@@ -211,7 +211,9 @@ class _CarouselSliderState extends State<CarouselSlider> {
             pageSnapping: _options.pageSnapping,
             controller: _pageController,
             reverse: _options.reverse,
-            itemCount: _options.enableInfiniteScroll ? null : widget.itemCount,
+            itemCount: _options.enableInfiniteScroll && widget.itemCount > 0
+                ? null
+                : widget.itemCount,
             onPageChanged: (index) {
               final currentPage = getIndexInLength(
                 position: index + _options.initialPage,
