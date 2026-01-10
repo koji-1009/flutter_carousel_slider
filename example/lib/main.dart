@@ -67,9 +67,7 @@ class CarouselDemoHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Carousel demo'),
-      ),
+      appBar: AppBar(title: const Text('Carousel demo')),
       body: ListView(
         children: const <Widget>[
           DemoItem('Basic demo', '/basic'),
@@ -101,19 +99,13 @@ class BasicDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     const list = [1, 2, 3, 4, 5];
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Basic demo'),
-      ),
+      appBar: AppBar(title: const Text('Basic demo')),
       body: CarouselSlider(
         items: list
             .map(
               (item) => Container(
                 color: Colors.green,
-                child: Center(
-                  child: Text(
-                    item.toString(),
-                  ),
-                ),
+                child: Center(child: Text(item.toString())),
               ),
             )
             .toList(),
@@ -129,21 +121,13 @@ class NoCenterDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     const list = [1, 2, 3, 4, 5];
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('No center demo'),
-      ),
+      appBar: AppBar(title: const Text('No center demo')),
       body: CarouselSlider(
-        options: const CarouselOptions(
-          disableCenter: true,
-        ),
+        options: const CarouselOptions(disableCenter: true),
         items: list
             .map(
-              (item) => Container(
-                color: Colors.green,
-                child: Text(
-                  item.toString(),
-                ),
-              ),
+              (item) =>
+                  Container(color: Colors.green, child: Text(item.toString())),
             )
             .toList(),
       ),
@@ -157,17 +141,10 @@ class ImageSliderDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Image slider demo'),
-      ),
+      appBar: AppBar(title: const Text('Image slider demo')),
       body: CarouselSlider(
         items: imgList
-            .map(
-              (item) => Image.network(
-                item,
-                fit: BoxFit.cover,
-              ),
-            )
+            .map((item) => Image.network(item, fit: BoxFit.cover))
             .toList(),
       ),
     );
@@ -179,15 +156,10 @@ final imageSliders = imgList
       (item) => Container(
         margin: const EdgeInsets.all(5.0),
         child: ClipRRect(
-          borderRadius: const BorderRadius.all(
-            Radius.circular(8),
-          ),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
           child: Stack(
             children: <Widget>[
-              Image.network(
-                item,
-                fit: BoxFit.cover,
-              ),
+              Image.network(item, fit: BoxFit.cover),
               Positioned.fill(
                 child: Container(
                   decoration: const BoxDecoration(
@@ -227,9 +199,7 @@ class ComplicatedImageDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Complicated image slider demo'),
-      ),
+      appBar: AppBar(title: const Text('Complicated image slider demo')),
       body: CarouselSlider(
         options: const CarouselOptions(
           autoPlay: true,
@@ -248,9 +218,7 @@ class EnlargeStrategyDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Complicated image slider demo'),
-      ),
+      appBar: AppBar(title: const Text('Complicated image slider demo')),
       body: CarouselSlider(
         options: const CarouselOptions(
           autoPlay: true,
@@ -278,9 +246,7 @@ class _ManuallyControlledSliderState extends State<ManuallyControlledSlider> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manually controlled slider'),
-      ),
+      appBar: AppBar(title: const Text('Manually controlled slider')),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -330,9 +296,7 @@ class NoonLoopingDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Noon-looping carousel demo'),
-      ),
+      appBar: AppBar(title: const Text('Noon-looping carousel demo')),
       body: CarouselSlider(
         options: const CarouselOptions(
           aspectRatio: 2.0,
@@ -353,9 +317,7 @@ class VerticalSliderDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vertical sliding carousel demo'),
-      ),
+      appBar: AppBar(title: const Text('Vertical sliding carousel demo')),
       body: CarouselSlider(
         options: const CarouselOptions(
           aspectRatio: 2.0,
@@ -376,9 +338,7 @@ class FullscreenSliderDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Fullscreen sliding carousel demo'),
-      ),
+      appBar: AppBar(title: const Text('Fullscreen sliding carousel demo')),
       body: CarouselSlider(
         options: CarouselOptions(
           height: height,
@@ -388,11 +348,7 @@ class FullscreenSliderDemo extends StatelessWidget {
         ),
         items: imgList
             .map(
-              (item) => Image.network(
-                item,
-                fit: BoxFit.cover,
-                height: height,
-              ),
+              (item) => Image.network(item, fit: BoxFit.cover, height: height),
             )
             .toList(),
       ),
@@ -406,9 +362,7 @@ class OnDemandCarouselDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('On-demand carousel demo'),
-      ),
+      appBar: AppBar(title: const Text('On-demand carousel demo')),
       body: CarouselSlider.builder(
         itemCount: 100,
         options: const CarouselOptions(
@@ -417,9 +371,7 @@ class OnDemandCarouselDemo extends StatelessWidget {
           autoPlay: true,
         ),
         itemBuilder: (context, index, realIdx) {
-          return Text(
-            index.toString(),
-          );
+          return Text(index.toString());
         },
       ),
     );
@@ -468,24 +420,24 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
               children: imgList
                   .asMap()
                   .entries
-                  .map((entry) => GestureDetector(
-                        onTap: () => _controller.animateToPage(entry.key),
-                        child: Container(
-                          width: 12.0,
-                          height: 12.0,
-                          margin: const EdgeInsets.symmetric(
-                            vertical: 8.0,
-                            horizontal: 4.0,
-                          ),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withOpacity(_current == entry.key ? 0.9 : 0.4),
-                          ),
+                  .map(
+                    (entry) => GestureDetector(
+                      onTap: () => _controller.animateToPage(entry.key),
+                      child: Container(
+                        width: 12.0,
+                        height: 12.0,
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 8.0,
+                          horizontal: 4.0,
                         ),
-                      ))
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Theme.of(context).colorScheme.onSurface
+                              .withAlpha(_current == entry.key ? 255 : 64),
+                        ),
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
           ],
@@ -526,9 +478,7 @@ class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Prefetch image slider demo'),
-      ),
+      appBar: AppBar(title: const Text('Prefetch image slider demo')),
       body: CarouselSlider.builder(
         itemCount: images.length,
         options: const CarouselOptions(
@@ -538,11 +488,7 @@ class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
         ),
         itemBuilder: (context, index, realIdx) => ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            images[index],
-            fit: BoxFit.cover,
-            width: 1000,
-          ),
+          child: Image.network(images[index], fit: BoxFit.cover, width: 1000),
         ),
       ),
     );
@@ -570,9 +516,7 @@ class _CarouselChangeReasonDemoState extends State<CarouselChangeReasonDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Change reason demo'),
-      ),
+      appBar: AppBar(title: const Text('Change reason demo')),
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -615,10 +559,7 @@ class _CarouselChangeReasonDemoState extends State<CarouselChangeReasonDemo> {
             ),
             Center(
               child: Column(
-                children: [
-                  const Text('page change reason: '),
-                  Text(reason),
-                ],
+                children: [const Text('page change reason: '), Text(reason)],
               ),
             ),
           ],
@@ -634,9 +575,7 @@ class KeepPageViewPositionDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Keep PageView position demo'),
-      ),
+      appBar: AppBar(title: const Text('Keep PageView position demo')),
       body: ListView.builder(
         itemBuilder: (ctx, index) {
           if (index == 3) {
@@ -650,14 +589,10 @@ class KeepPageViewPositionDemo extends StatelessWidget {
             );
           } else {
             return Container(
-              margin: const EdgeInsets.symmetric(
-                vertical: 20,
-              ),
+              margin: const EdgeInsets.symmetric(vertical: 20),
               color: Colors.blue,
               height: 200,
-              child: const Center(
-                child: Text('other content'),
-              ),
+              child: const Center(child: Text('other content')),
             );
           }
         },
@@ -672,9 +607,7 @@ class MultipleItemDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Multiple item in one slide demo'),
-      ),
+      appBar: AppBar(title: const Text('Multiple item in one slide demo')),
       body: CarouselSlider.builder(
         options: const CarouselOptions(
           aspectRatio: 2.0,
@@ -691,9 +624,7 @@ class MultipleItemDemo extends StatelessWidget {
                   (idx) => Expanded(
                     flex: 1,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                      ),
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
                       child: Image.network(
                         imgList[idx],
                         fit: BoxFit.cover,
@@ -716,9 +647,7 @@ class EnlargeStrategyZoomDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('enlarge strategy: zoom demo'),
-      ),
+      appBar: AppBar(title: const Text('enlarge strategy: zoom demo')),
       body: CarouselSlider(
         options: const CarouselOptions(
           aspectRatio: 2.0,
