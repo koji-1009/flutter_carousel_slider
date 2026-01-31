@@ -44,10 +44,10 @@ CarouselSlider(
     height: 400,
   ),
   items: [1,2,3,4,5].map((i) {
-    Container(
+    return Container(
       width: MediaQuery.sizeOf(context).width,
       margin: EdgeInsets.symmetric(
-        horizontal: 8.
+        horizontal: 8.0
       ),
       decoration: BoxDecoration(
         color: Colors.amber
@@ -59,7 +59,7 @@ CarouselSlider(
         ),
       ),
     );
-  }.toList(),
+  }).toList(),
 )
 ```
 
