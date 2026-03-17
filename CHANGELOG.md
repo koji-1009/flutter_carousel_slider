@@ -1,3 +1,7 @@
+## 6.1.1
+
+* Fix `animateToClosest` backward wrap bug.
+
 ## 6.1.0
 
 * Fix initial page position issue.
