@@ -813,8 +813,7 @@ void main() {
   });
 
   group('animateToClosest option', () {
-    testWidgets('when false, does not search for closest path',
-        (tester) async {
+    testWidgets('when false, does not search for closest path', (tester) async {
       final controller = CarouselControllerX();
 
       await tester.pumpWidget(
@@ -844,8 +843,7 @@ void main() {
       expect(find.text('4'), findsOneWidget);
     });
 
-    testWidgets(
-        'when true, chooses backward wrap when it is the shortest path',
+    testWidgets('when true, chooses backward wrap when it is the shortest path',
         (tester) async {
       // Regression: duplicate condition bug caused backward wrap to never
       // be selected. With 10 items at page 1, animateToPage(9) should go
@@ -884,8 +882,7 @@ void main() {
   });
 
   group('Enlarge Strategies', () {
-    testWidgets('Scale strategy renders with Transform.scale',
-        (tester) async {
+    testWidgets('Scale strategy renders with Transform.scale', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -909,8 +906,7 @@ void main() {
 
       // Center item (Item 1) should exist with Transform
       final item1TransformFinder = find
-          .ancestor(
-              of: find.text('Item 1'), matching: find.byType(Transform))
+          .ancestor(of: find.text('Item 1'), matching: find.byType(Transform))
           .first;
       final transform1 = tester.widget<Transform>(item1TransformFinder);
       final scale1 = transform1.transform.storage[0];
