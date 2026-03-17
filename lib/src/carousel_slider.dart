@@ -382,9 +382,10 @@ class _CarouselSliderState extends State<CarouselSlider> {
         if (_options.enableInfiniteScroll && _options.animateToClosest) {
           final distance = (page - index).abs();
           final distanceWithNext = (page + widget.itemCount - index).abs();
+          final distanceWithPrev = (page - widget.itemCount - index).abs();
           if (distance > distanceWithNext) {
             smallestMovement = page + widget.itemCount - index;
-          } else if (distance > distanceWithNext) {
+          } else if (distance > distanceWithPrev) {
             smallestMovement = page - widget.itemCount - index;
           }
         }
