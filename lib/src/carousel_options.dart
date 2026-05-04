@@ -13,6 +13,8 @@ enum CarouselPageChangedReason {
   controller,
 
   /// The page change was triggered by restore page with [PageStorageKey].
+  @Deprecated(
+      'This value is no longer used and will be removed in a future version.')
   restore,
 }
 

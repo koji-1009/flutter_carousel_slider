@@ -144,21 +144,6 @@ class _CarouselSliderState extends State<CarouselSlider> {
       // After the first build method, request a redraw
       if (!mounted) return;
       setState(() {});
-
-      final position = _pageController.position;
-      final storageContext = position.context.storageContext;
-      final previousSavedPosition =
-          PageStorage.of(storageContext).readState(storageContext) as double?;
-      if (previousSavedPosition != null) {
-        widget.onPageChanged?.call(
-          getIndexInLength(
-            position: _currentPage.floor(),
-            base: _initialOffset,
-            length: widget.itemCount,
-          ),
-          CarouselPageChangedReason.restore,
-        );
-      }
     });
 
     _setupCarouselControllerX();
@@ -423,11 +408,6 @@ class _CarouselSliderState extends State<CarouselSlider> {
     }
 
     _timer = Timer.periodic(_options.autoPlayInterval, (_) async {
-      if (!mounted) {
-        _clearTimer();
-        return;
-      }
-
       final route = ModalRoute.of(context);
       if (route?.isCurrent == false) {
         return;
@@ -462,11 +442,9 @@ class _CarouselSliderState extends State<CarouselSlider> {
     }
 
     if (_timer != null) {
-      // already running
       return;
     }
 
-    _clearTimer();
     _resumeTimer();
   }
 }
@@ -507,20 +485,12 @@ class _GestureHandler extends StatelessWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onPanStart: (_) {
-        changeManualMode();
-      },
       onPanDown: (_) {
         if (options.pauseAutoPlayOnTouch) {
           requestClearTimer();
         }
 
         changeManualMode();
-      },
-      onPanEnd: (_) {
-        if (options.pauseAutoPlayOnTouch) {
-          requestResumeTimer();
-        }
       },
       onPanCancel: () {
         if (options.pauseAutoPlayOnTouch) {

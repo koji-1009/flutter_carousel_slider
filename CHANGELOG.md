@@ -1,3 +1,9 @@
+## 6.1.2
+
+* Remove unreachable dead code in gesture handling and auto play timer.
+* Deprecate `CarouselPageChangedReason.restore` (no longer used).
+* Improve test coverage to 100%.
+
 ## 6.1.1
 
 * Fix `animateToClosest` backward wrap bug.
