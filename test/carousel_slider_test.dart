@@ -1349,4 +1349,272 @@ void main() {
       expect(() => controller.stopAutoPlay(), returnsNormally);
     });
   });
+
+  group('animateToClosest forward wrap', () {
+    testWidgets('chooses forward wrap when it is the shortest path',
+        (tester) async {
+      // With 10 items at page 9, animateToPage(0) should go forward 1 step
+      // (9->0) instead of backward 9 steps (9->8->...->0).
+      // distance = |0-9| = 9
+      // distanceWithNext = |0+10-9| = 1 (shorter!)
+      // distanceWithPrev = |0-10-9| = 19
+      final controller = CarouselControllerX();
+      int? lastChangedIndex;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              carouselController: controller,
+              options: const CarouselOptions(
+                enableInfiniteScroll: true,
+                initialPage: 9,
+                animateToClosest: true,
+                viewportFraction: 1.0,
+              ),
+              onPageChanged: (index, reason) {
+                lastChangedIndex = index;
+              },
+              items: List.generate(10, (i) => Text('P$i')),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('P9'), findsOneWidget);
+
+      controller.animateToPage(0);
+      await tester.pumpAndSettle();
+
+      expect(lastChangedIndex, 0);
+      expect(find.text('P0'), findsOneWidget);
+    });
+  });
+
+  group('GestureDetector', () {
+    testWidgets('onPanDown sets mode to manual', (tester) async {
+      CarouselPageChangedReason? reason;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                viewportFraction: 1.0,
+                enableInfiniteScroll: false,
+                disableGesture: false,
+              ),
+              onPageChanged: (index, r) {
+                reason = r;
+              },
+              items: const [
+                Text('Item 1'),
+                Text('Item 2'),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.fling(find.text('Item 1'), const Offset(-500, 0), 2000);
+      await tester.pumpAndSettle();
+
+      expect(reason, CarouselPageChangedReason.manual);
+    });
+
+    testWidgets('onPanCancel resumes timer when pauseAutoPlayOnTouch is true',
+        (tester) async {
+      int pageChanges = 0;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                autoPlay: true,
+                autoPlayInterval: Duration(milliseconds: 500),
+                autoPlayAnimationDuration: Duration(milliseconds: 100),
+                viewportFraction: 1.0,
+                enableInfiniteScroll: true,
+                pauseAutoPlayOnTouch: true,
+                disableGesture: false,
+              ),
+              onPageChanged: (index, reason) {
+                pageChanges++;
+              },
+              items: const [
+                Text('Item 1'),
+                Text('Item 2'),
+                Text('Item 3'),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      // Start touch and release immediately (triggers onPanDown then onPanEnd)
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.text('Item 1')),
+        kind: PointerDeviceKind.touch,
+      );
+
+      // Move slightly then release to trigger onPanEnd
+      await gesture.moveBy(const Offset(5, 0));
+      await gesture.up();
+      await tester.pump();
+
+      // After release, timer should resume. Wait for auto play.
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+
+      expect(pageChanges, greaterThan(0));
+    });
+  });
+
+  group('PageStorage', () {
+    testWidgets('restores page position when widget is rebuilt',
+        (tester) async {
+      final bucket = PageStorageBucket();
+      const pageKey = PageStorageKey<String>('carousel_restore_test');
+
+      // First: create carousel and scroll to page 1
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PageStorage(
+              bucket: bucket,
+              child: CarouselSlider(
+                options: const CarouselOptions(
+                  pageViewKey: pageKey,
+                  enableInfiniteScroll: false,
+                  viewportFraction: 1.0,
+                ),
+                items: const [Text('A'), Text('B'), Text('C')],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      // Scroll to page 1
+      await tester.fling(find.text('A'), const Offset(-500, 0), 2000);
+      await tester.pumpAndSettle();
+      expect(find.text('B'), findsOneWidget);
+
+      // Rebuild with new widget tree that reads from PageStorage
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: PageStorage(
+              bucket: bucket,
+              child: CarouselSlider(
+                options: const CarouselOptions(
+                  pageViewKey: pageKey,
+                  enableInfiniteScroll: false,
+                  viewportFraction: 1.0,
+                ),
+                items: const [Text('A'), Text('B'), Text('C')],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      // The page should be restored from PageStorage
+      expect(find.text('B'), findsOneWidget);
+    });
+
+    testWidgets('restores page position after Navigator push/pop',
+        (tester) async {
+      CarouselPageChangedReason? lastReason;
+
+      final navigatorKey = GlobalKey<NavigatorState>();
+
+      Widget buildCarousel() {
+        return CarouselSlider(
+          options: const CarouselOptions(
+            pageViewKey: PageStorageKey<String>('nav_test'),
+            enableInfiniteScroll: false,
+            viewportFraction: 1.0,
+          ),
+          onPageChanged: (index, reason) {
+            lastReason = reason;
+          },
+          items: const [Text('Page0'), Text('Page1'), Text('Page2')],
+        );
+      }
+
+      await tester.pumpWidget(
+        MaterialApp(
+          navigatorKey: navigatorKey,
+          home: Scaffold(body: buildCarousel()),
+        ),
+      );
+
+      // Scroll to page 1
+      await tester.fling(find.text('Page0'), const Offset(-500, 0), 2000);
+      await tester.pumpAndSettle();
+      expect(find.text('Page1'), findsOneWidget);
+      expect(lastReason, CarouselPageChangedReason.manual);
+
+      // Push a new route
+      navigatorKey.currentState!.push(
+        MaterialPageRoute<void>(
+          builder: (_) => const Scaffold(body: Text('Other')),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Other'), findsOneWidget);
+
+      // Pop back - carousel should restore from PageStorage
+      navigatorKey.currentState!.pop();
+      await tester.pumpAndSettle();
+
+      // Page should still be at 1 (restored)
+      expect(find.text('Page1'), findsOneWidget);
+    });
+  });
+
+  group('AutoPlay dispose safety', () {
+    testWidgets('no crash when disposed during autoplay', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                autoPlay: true,
+                autoPlayInterval: Duration(milliseconds: 100),
+                autoPlayAnimationDuration: Duration(milliseconds: 50),
+                viewportFraction: 1.0,
+                enableInfiniteScroll: true,
+              ),
+              items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
+            ),
+          ),
+        ),
+      );
+
+      // Let auto play run
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.pump();
+
+      // Dispose by replacing widget
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: Text('New Page'),
+          ),
+        ),
+      );
+
+      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pumpAndSettle();
+
+      expect(find.text('New Page'), findsOneWidget);
+    });
+  });
 }
