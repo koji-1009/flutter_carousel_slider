@@ -1,5 +1,10 @@
 # carousel_slider_x
 
+[![pub package](https://img.shields.io/pub/v/carousel_slider_x.svg)](https://pub.dev/packages/carousel_slider_x)
+[![GitHub license](https://img.shields.io/github/license/koji-1009/flutter_carousel_slider)](https://github.com/koji-1009/flutter_carousel_slider/blob/main/LICENSE)
+[![CI](https://github.com/koji-1009/flutter_carousel_slider/actions/workflows/analyze.yaml/badge.svg)](https://github.com/koji-1009/flutter_carousel_slider/actions/workflows/analyze.yaml)
+[![codecov](https://codecov.io/gh/koji-1009/flutter_carousel_slider/branch/main/graph/badge.svg)](https://codecov.io/gh/koji-1009/flutter_carousel_slider)
+
 This package is a fork of the original [carousel_slider](https://pub.dev/packages/carousel_slider) package.
 
 A carousel slider widget, support infinite scroll and auto play, enlarge mode.
