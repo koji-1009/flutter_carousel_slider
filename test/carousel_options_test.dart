@@ -5,14 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('CarouselOptions', () {
     test('supports value equality', () {
-      const options1 = CarouselOptions(
-        height: 200,
-        enableInfiniteScroll: true,
-      );
-      const options2 = CarouselOptions(
-        height: 200,
-        enableInfiniteScroll: true,
-      );
+      const options1 = CarouselOptions(height: 200, enableInfiniteScroll: true);
+      const options2 = CarouselOptions(height: 200, enableInfiniteScroll: true);
       const options3 = CarouselOptions(
         height: 300,
         enableInfiniteScroll: false,

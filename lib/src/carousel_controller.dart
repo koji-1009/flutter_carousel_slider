@@ -2,20 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'carousel_options.dart';
 
-typedef PageChangeCallback = Future<void> Function(
-  Duration duration,
-  Curve curve,
-);
+typedef PageChangeCallback =
+    Future<void> Function(Duration duration, Curve curve);
 
-typedef JumpToCallback = void Function(
-  int page,
-);
+typedef JumpToCallback = void Function(int page);
 
-typedef AnimateToPageCallback = Future<void> Function(
-  int page,
-  Duration duration,
-  Curve curve,
-);
+typedef AnimateToPageCallback =
+    Future<void> Function(int page, Duration duration, Curve curve);
 
 /// Controller to operate the [CarouselSlider]. It interacts with the widget through callbacks.
 class CarouselControllerX {
@@ -63,9 +56,7 @@ class CarouselControllerX {
   /// The animation lasts for the given duration and follows the given curve.
   /// The returned [Future] resolves when the animation completes.
   Future<void> nextPage({
-    Duration duration = const Duration(
-      milliseconds: 300,
-    ),
+    Duration duration = const Duration(milliseconds: 300),
     Curve curve = Curves.linear,
   }) async {
     await _onNextPageCallback?.call(duration, curve);
@@ -76,9 +67,7 @@ class CarouselControllerX {
   /// The animation lasts for the given duration and follows the given curve.
   /// The returned [Future] resolves when the animation completes.
   Future<void> previousPage({
-    Duration duration = const Duration(
-      milliseconds: 300,
-    ),
+    Duration duration = const Duration(milliseconds: 300),
     Curve curve = Curves.linear,
   }) async {
     await _onPreviousPageCallback?.call(duration, curve);
@@ -98,9 +87,7 @@ class CarouselControllerX {
   /// The returned [Future] resolves when the animation completes.
   Future<void> animateToPage(
     int page, {
-    Duration duration = const Duration(
-      milliseconds: 300,
-    ),
+    Duration duration = const Duration(milliseconds: 300),
     Curve curve = Curves.linear,
   }) async {
     await _onAnimateToPageCallback?.call(page, duration, curve);
