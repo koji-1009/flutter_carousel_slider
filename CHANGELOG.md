@@ -1,3 +1,7 @@
+## 6.2.0
+
+* Update to equatable ^2.1.0
+
 ## 6.1.2
 
 * Remove unreachable dead code in gesture handling and auto play timer.
