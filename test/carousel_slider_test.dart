@@ -14,11 +14,7 @@ void main() {
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-                Text('Item 3'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
             ),
           ),
         ),
@@ -59,11 +55,7 @@ void main() {
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-                Text('Item 3'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
             ),
           ),
         ),
@@ -93,10 +85,7 @@ void main() {
                 changedIndex = index;
                 changedReason = reason;
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -127,10 +116,7 @@ void main() {
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -153,10 +139,7 @@ void main() {
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -170,8 +153,9 @@ void main() {
       expect(find.text('Item 1'), findsOneWidget);
     });
 
-    testWidgets('jumpToPage moves to specific item without animation',
-        (tester) async {
+    testWidgets('jumpToPage moves to specific item without animation', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -181,11 +165,7 @@ void main() {
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-                Text('Item 3'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
             ),
           ),
         ),
@@ -211,10 +191,7 @@ void main() {
                 viewportFraction: 1.0,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -246,11 +223,7 @@ void main() {
                 enableInfiniteScroll: true,
                 initialPage: 0,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-                Text('Item 3'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
             ),
           ),
         ),
@@ -397,8 +370,9 @@ void main() {
   });
 
   group('Complex Logic Coverage', () {
-    testWidgets('animateToPage with infinite scroll searches closest',
-        (tester) async {
+    testWidgets('animateToPage with infinite scroll searches closest', (
+      tester,
+    ) async {
       final controller = CarouselControllerX();
       await tester.pumpWidget(
         MaterialApp(
@@ -431,7 +405,9 @@ void main() {
               bucket: PageStorageBucket(),
               child: CarouselSlider(
                 options: const CarouselOptions(
-                    pageViewKey: pageKey, enableInfiniteScroll: false),
+                  pageViewKey: pageKey,
+                  enableInfiniteScroll: false,
+                ),
                 items: const [Text('1'), Text('2')],
               ),
             ),
@@ -451,7 +427,9 @@ void main() {
               bucket: PageStorageBucket(),
               child: CarouselSlider(
                 options: const CarouselOptions(
-                    pageViewKey: pageKey, enableInfiniteScroll: false),
+                  pageViewKey: pageKey,
+                  enableInfiniteScroll: false,
+                ),
                 items: const [Text('1'), Text('2')],
               ),
             ),
@@ -499,8 +477,9 @@ void main() {
   });
 
   group('Regression Tests', () {
-    testWidgets('enlargeCenterPage scales down side items on initial render',
-        (tester) async {
+    testWidgets('enlargeCenterPage scales down side items on initial render', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -511,11 +490,7 @@ void main() {
                 initialPage: 1,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 0'),
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 0'), Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -540,8 +515,11 @@ void main() {
       final scale0 = transform0.transform.storage[0];
       final scale1 = transform1.transform.storage[0];
 
-      expect(scale1, closeTo(1.0, 0.01),
-          reason: 'Center item should be full scale');
+      expect(
+        scale1,
+        closeTo(1.0, 0.01),
+        reason: 'Center item should be full scale',
+      );
       expect(scale0, lessThan(0.95), reason: 'Side item should be scaled down');
     });
   });
@@ -561,10 +539,7 @@ void main() {
               onScrolled: (position) {
                 positions.add(position);
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -592,10 +567,7 @@ void main() {
               onScrolled: (position) {
                 positions.add(position);
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -619,10 +591,7 @@ void main() {
                 enableInfiniteScroll: false,
                 disableGesture: true,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -650,10 +619,7 @@ void main() {
                 enableInfiniteScroll: false,
                 disableGesture: false,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -688,11 +654,7 @@ void main() {
               onPageChanged: (index, reason) {
                 pageChanges++;
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-                Text('Item 3'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
             ),
           ),
         ),
@@ -744,10 +706,7 @@ void main() {
               onPageChanged: (index, reason) {
                 lastPageIndex = index;
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -787,10 +746,7 @@ void main() {
               onPageChanged: (index, reason) {
                 lastPageIndex = index;
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -826,12 +782,7 @@ void main() {
                 initialPage: 0,
                 animateToClosest: false,
               ),
-              items: const [
-                Text('1'),
-                Text('2'),
-                Text('3'),
-                Text('4'),
-              ],
+              items: const [Text('1'), Text('2'), Text('3'), Text('4')],
             ),
           ),
         ),
@@ -843,42 +794,44 @@ void main() {
       expect(find.text('4'), findsOneWidget);
     });
 
-    testWidgets('when true, chooses backward wrap when it is the shortest path',
-        (tester) async {
-      // Regression: duplicate condition bug caused backward wrap to never
-      // be selected. With 10 items at page 1, animateToPage(9) should go
-      // backward 2 steps (1->0->9) instead of forward 8 steps (1->2->...->9).
-      final controller = CarouselControllerX();
-      int? lastChangedIndex;
+    testWidgets(
+      'when true, chooses backward wrap when it is the shortest path',
+      (tester) async {
+        // Regression: duplicate condition bug caused backward wrap to never
+        // be selected. With 10 items at page 1, animateToPage(9) should go
+        // backward 2 steps (1->0->9) instead of forward 8 steps (1->2->...->9).
+        final controller = CarouselControllerX();
+        int? lastChangedIndex;
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CarouselSlider(
-              carouselController: controller,
-              options: const CarouselOptions(
-                enableInfiniteScroll: true,
-                initialPage: 1,
-                animateToClosest: true,
-                viewportFraction: 1.0,
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: CarouselSlider(
+                carouselController: controller,
+                options: const CarouselOptions(
+                  enableInfiniteScroll: true,
+                  initialPage: 1,
+                  animateToClosest: true,
+                  viewportFraction: 1.0,
+                ),
+                onPageChanged: (index, reason) {
+                  lastChangedIndex = index;
+                },
+                items: List.generate(10, (i) => Text('P$i')),
               ),
-              onPageChanged: (index, reason) {
-                lastChangedIndex = index;
-              },
-              items: List.generate(10, (i) => Text('P$i')),
             ),
           ),
-        ),
-      );
+        );
 
-      expect(find.text('P1'), findsOneWidget);
+        expect(find.text('P1'), findsOneWidget);
 
-      controller.animateToPage(9);
-      await tester.pumpAndSettle();
+        controller.animateToPage(9);
+        await tester.pumpAndSettle();
 
-      expect(lastChangedIndex, 9);
-      expect(find.text('P9'), findsOneWidget);
-    });
+        expect(lastChangedIndex, 9);
+        expect(find.text('P9'), findsOneWidget);
+      },
+    );
   });
 
   group('Enlarge Strategies', () {
@@ -894,11 +847,7 @@ void main() {
                 initialPage: 1,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 0'),
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 0'), Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -917,8 +866,9 @@ void main() {
       expect(find.byType(SizedBox), findsWidgets);
     });
 
-    testWidgets('Horizontal zoom strategy uses correct alignment',
-        (tester) async {
+    testWidgets('Horizontal zoom strategy uses correct alignment', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -931,11 +881,7 @@ void main() {
                 initialPage: 1,
                 enableInfiniteScroll: false,
               ),
-              items: const [
-                Text('Item 0'),
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 0'), Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -1010,10 +956,7 @@ void main() {
 
       // Center should not wrap the item text
       expect(
-        find.ancestor(
-          of: find.text('Item 1'),
-          matching: find.byType(Center),
-        ),
+        find.ancestor(of: find.text('Item 1'), matching: find.byType(Center)),
         findsNothing,
       );
     });
@@ -1034,10 +977,7 @@ void main() {
       );
 
       expect(
-        find.ancestor(
-          of: find.text('Item 1'),
-          matching: find.byType(Center),
-        ),
+        find.ancestor(of: find.text('Item 1'), matching: find.byType(Center)),
         findsOneWidget,
       );
     });
@@ -1068,9 +1008,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: CarouselSlider(
-              options: const CarouselOptions(
-                enableInfiniteScroll: false,
-              ),
+              options: const CarouselOptions(enableInfiniteScroll: false),
               items: const [Text('1'), Text('2')],
             ),
           ),
@@ -1094,10 +1032,7 @@ void main() {
                 enableInfiniteScroll: false,
                 height: 400,
               ),
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -1134,8 +1069,9 @@ void main() {
   });
 
   group('didUpdateWidget', () {
-    testWidgets('updates page controller when initialPage changes',
-        (tester) async {
+    testWidgets('updates page controller when initialPage changes', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -1247,9 +1183,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: CarouselSlider(
-              options: const CarouselOptions(
-                enableInfiniteScroll: false,
-              ),
+              options: const CarouselOptions(enableInfiniteScroll: false),
               items: const [Text('1'), Text('2')],
             ),
           ),
@@ -1284,9 +1218,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: CarouselSlider(
-              options: const CarouselOptions(
-                enableInfiniteScroll: false,
-              ),
+              options: const CarouselOptions(enableInfiniteScroll: false),
               items: const [Text('1'), Text('2')],
             ),
           ),
@@ -1321,9 +1253,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: CarouselSlider(
-              options: const CarouselOptions(
-                enableInfiniteScroll: false,
-              ),
+              options: const CarouselOptions(enableInfiniteScroll: false),
               items: const [Text('1'), Text('2')],
             ),
           ),
@@ -1351,8 +1281,9 @@ void main() {
   });
 
   group('animateToClosest forward wrap', () {
-    testWidgets('chooses forward wrap when it is the shortest path',
-        (tester) async {
+    testWidgets('chooses forward wrap when it is the shortest path', (
+      tester,
+    ) async {
       // With 10 items at page 9, animateToPage(0) should go forward 1 step
       // (9->0) instead of backward 9 steps (9->8->...->0).
       // distance = |0-9| = 9
@@ -1407,10 +1338,7 @@ void main() {
               onPageChanged: (index, r) {
                 reason = r;
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2')],
             ),
           ),
         ),
@@ -1422,8 +1350,9 @@ void main() {
       expect(reason, CarouselPageChangedReason.manual);
     });
 
-    testWidgets('onPanCancel resumes timer when pauseAutoPlayOnTouch is true',
-        (tester) async {
+    testWidgets('onPanCancel resumes timer when pauseAutoPlayOnTouch is true', (
+      tester,
+    ) async {
       int pageChanges = 0;
 
       await tester.pumpWidget(
@@ -1442,11 +1371,7 @@ void main() {
               onPageChanged: (index, reason) {
                 pageChanges++;
               },
-              items: const [
-                Text('Item 1'),
-                Text('Item 2'),
-                Text('Item 3'),
-              ],
+              items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
             ),
           ),
         ),
@@ -1473,8 +1398,9 @@ void main() {
   });
 
   group('PageStorage', () {
-    testWidgets('restores page position when widget is rebuilt',
-        (tester) async {
+    testWidgets('restores page position when widget is rebuilt', (
+      tester,
+    ) async {
       final bucket = PageStorageBucket();
       const pageKey = PageStorageKey<String>('carousel_restore_test');
 
@@ -1528,8 +1454,9 @@ void main() {
       expect(find.text('B'), findsOneWidget);
     });
 
-    testWidgets('restores page position after Navigator push/pop',
-        (tester) async {
+    testWidgets('restores page position after Navigator push/pop', (
+      tester,
+    ) async {
       CarouselPageChangedReason? lastReason;
 
       final navigatorKey = GlobalKey<NavigatorState>();
@@ -1604,11 +1531,7 @@ void main() {
 
       // Dispose by replacing widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Text('New Page'),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: Text('New Page'))),
       );
 
       await tester.pump(const Duration(milliseconds: 200));

@@ -14,16 +14,13 @@ enum CarouselPageChangedReason {
 
   /// The page change was triggered by restore page with [PageStorageKey].
   @Deprecated(
-      'This value is no longer used and will be removed in a future version.')
+    'This value is no longer used and will be removed in a future version.',
+  )
   restore,
 }
 
 /// Strategy for enlarging effect.
-enum CenterPageEnlargeStrategy {
-  height,
-  zoom,
-  scale,
-}
+enum CenterPageEnlargeStrategy { height, zoom, scale }
 
 class CarouselOptions with Equatable {
   const CarouselOptions({
@@ -182,30 +179,30 @@ class CarouselOptions with Equatable {
 
   @override
   List<Object?> get props => [
-        height,
-        aspectRatio,
-        viewportFraction,
-        initialPage,
-        enableInfiniteScroll,
-        animateToClosest,
-        reverse,
-        autoPlay,
-        autoPlayInterval,
-        autoPlayAnimationDuration,
-        autoPlayCurve,
-        enlargeCenterPage,
-        scrollPhysics,
-        pageSnapping,
-        scrollDirection,
-        pauseAutoPlayOnTouch,
-        pauseAutoPlayOnManualNavigate,
-        pauseAutoPlayInFiniteScroll,
-        pageViewKey,
-        enlargeStrategy,
-        enlargeFactor,
-        disableCenter,
-        disableGesture,
-        padEnds,
-        clipBehavior,
-      ];
+    height,
+    aspectRatio,
+    viewportFraction,
+    initialPage,
+    enableInfiniteScroll,
+    animateToClosest,
+    reverse,
+    autoPlay,
+    autoPlayInterval,
+    autoPlayAnimationDuration,
+    autoPlayCurve,
+    enlargeCenterPage,
+    scrollPhysics,
+    pageSnapping,
+    scrollDirection,
+    pauseAutoPlayOnTouch,
+    pauseAutoPlayOnManualNavigate,
+    pauseAutoPlayInFiniteScroll,
+    pageViewKey,
+    enlargeStrategy,
+    enlargeFactor,
+    disableCenter,
+    disableGesture,
+    padEnds,
+    clipBehavior,
+  ];
 }
