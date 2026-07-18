@@ -25,7 +25,7 @@ enum CenterPageEnlargeStrategy {
   scale,
 }
 
-class CarouselOptions with EquatableMixin {
+class CarouselOptions with Equatable {
   const CarouselOptions({
     this.height,
     this.aspectRatio = 16 / 9,
