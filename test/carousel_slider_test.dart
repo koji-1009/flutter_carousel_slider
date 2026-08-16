@@ -959,9 +959,109 @@ void main() {
       // It has to shrink towards the centre for the whole drag, not only once
       // the offset lands on a whole page.
       expect(_transformOf(tester, 'Item 0').alignment, Alignment.centerRight);
+      // The item after the centre keeps anchoring on its other edge.
+      expect(_transformOf(tester, 'Item 1').alignment, Alignment.centerLeft);
 
       await gesture.up();
       await tester.pumpAndSettle();
+    });
+
+    testWidgets('vertical zoom alignment holds while between pages', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                scrollDirection: Axis.vertical,
+                aspectRatio: 2.0,
+                enlargeCenterPage: true,
+                enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+                enlargeFactor: 0.4,
+              ),
+              items: List.generate(5, (i) => Text('Item $i')),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(PageView)),
+      );
+      await tester.pump();
+      await gesture.moveBy(const Offset(0, -30));
+      await tester.pump();
+      await gesture.moveBy(const Offset(0, -60));
+      await tester.pump();
+
+      final page = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller!
+          .page!;
+      expect(page, greaterThan(10000.1));
+      expect(page, lessThan(10000.9));
+
+      expect(_transformOf(tester, 'Item 0').alignment, Alignment.bottomCenter);
+      expect(_transformOf(tester, 'Item 1').alignment, Alignment.topCenter);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('the zoom item does not jump when the scroll settles', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                aspectRatio: 2.0,
+                enlargeCenterPage: true,
+                enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+                enlargeFactor: 0.4,
+              ),
+              items: List.generate(5, (i) => Text('Item $i')),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(PageView)),
+      );
+      await tester.pump();
+      await gesture.moveBy(const Offset(-30, 0));
+      await tester.pump();
+      for (var i = 0; i < 10; i++) {
+        await gesture.moveBy(const Offset(-60, 0));
+        await tester.pump();
+      }
+      await gesture.up();
+
+      // Follow the item that was in the centre all the way to its resting
+      // position. It has to stay on screen and move continuously.
+      var previousLeft = tester.getRect(find.text('Item 0')).left;
+      var largestStep = 0.0;
+      void measure() {
+        expect(find.text('Item 0'), findsOneWidget);
+        final left = tester.getRect(find.text('Item 0')).left;
+        final step = (left - previousLeft).abs();
+        if (step > largestStep) largestStep = step;
+        previousLeft = left;
+      }
+
+      for (var i = 0; i < 30; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        measure();
+      }
+      await tester.pumpAndSettle();
+      measure();
+
+      expect(largestStep, lessThan(20.0));
     });
 
     testWidgets('Vertical zoom strategy uses correct alignment', (
