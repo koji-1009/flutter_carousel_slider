@@ -205,8 +205,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
                 : widget.itemCount,
             onPageChanged: (index) {
               final currentPage = getIndexInLength(
-                position: index + _options.initialPage,
-                base: _initialPosition,
+                position: index,
+                base: _initialOffset,
                 length: widget.itemCount,
               );
 
@@ -222,8 +222,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
               final child = widget.itemBuilder != null
                   ? widget.itemBuilder!(context, index, realIndex)
                   : widget.items[index];
-              return AnimatedBuilder(
-                animation: _pageController,
+              return ListenableBuilder(
+                listenable: _pageController,
                 child: child,
                 builder: (context, child) {
                   // `_pageController.page` can only be accessed after the first build,
@@ -398,10 +398,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
   }
 
   void _clearTimer() {
-    if (_timer != null) {
-      _timer?.cancel();
-      _timer = null;
-    }
+    _timer?.cancel();
+    _timer = null;
   }
 
   void _resumeTimer() {
@@ -443,10 +441,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       return;
     }
 
-    if (_timer != null) {
-      return;
-    }
-
+    // [_resumeTimer] is a no-op while a timer is already running.
     _resumeTimer();
   }
 }
