@@ -286,7 +286,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
                       ),
                       CenterPageEnlargeStrategy.zoom => _Zoom(
                         scale: scale,
-                        itemOffset: itemOffset.floor(),
+                        itemOffset: itemOffset,
                       ),
                       CenterPageEnlargeStrategy.scale => _Scale(
                         scale: scale,
@@ -549,7 +549,11 @@ class _Zoom extends _StrategyOption {
   const _Zoom({required this.scale, required this.itemOffset});
 
   final double scale;
-  final int itemOffset;
+
+  /// Distance from the centre of the viewport, in pages. Positive when the item
+  /// is before the centre. Kept fractional so that the alignment stays stable
+  /// while scrolling.
+  final double itemOffset;
 }
 
 class _Scale extends _StrategyOption {

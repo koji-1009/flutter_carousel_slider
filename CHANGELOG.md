@@ -3,6 +3,7 @@
 * Fix `carouselController` not working when it is replaced without changing `options`.
 * Keep the `PageController` and its scroll position when the changed options do not affect it.
 * Fix a new `autoPlayInterval` not being applied while auto play is running.
+* Fix `CenterPageEnlargeStrategy.zoom` anchoring an item on the wrong edge while scrolling, which made it jump once the scroll settled.
 * Remove the `equatable` dependency. `CarouselOptions` no longer exposes `props`.
 * Use `ListenableBuilder` instead of `AnimatedBuilder`.
 * Remove unreachable dead code in `getIndexInLength`.
