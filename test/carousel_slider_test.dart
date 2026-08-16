@@ -1156,6 +1156,102 @@ void main() {
 
       expect(find.text('2'), findsOneWidget);
     });
+
+    testWidgets('replaced carouselController drives the carousel', (
+      tester,
+    ) async {
+      final first = CarouselControllerX();
+      final second = CarouselControllerX();
+
+      Widget build(CarouselControllerX controller) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: const CarouselOptions(
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+            ),
+            carouselController: controller,
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(first));
+      expect(find.text('1'), findsOneWidget);
+
+      // Swap the controller without touching the options.
+      await tester.pumpWidget(build(second));
+      await tester.pumpAndSettle();
+
+      second.nextPage(duration: const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
+
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('keeps the page controller when unrelated options change', (
+      tester,
+    ) async {
+      Widget build(Duration autoPlayInterval) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+              autoPlayInterval: autoPlayInterval,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(const Duration(seconds: 4)));
+      await tester.pumpAndSettle();
+
+      final controllerBefore = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller;
+
+      await tester.pumpWidget(build(const Duration(seconds: 2)));
+      await tester.pumpAndSettle();
+
+      final controllerAfter = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller;
+
+      expect(identical(controllerBefore, controllerAfter), isTrue);
+    });
+
+    testWidgets('recreates the page controller when viewportFraction changes', (
+      tester,
+    ) async {
+      Widget build(double viewportFraction) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              viewportFraction: viewportFraction,
+              enableInfiniteScroll: false,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(1.0));
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(build(0.5));
+      await tester.pumpAndSettle();
+
+      final controller = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller;
+
+      expect(controller?.viewportFraction, 0.5);
+    });
   });
 
   group('PageView passthrough options', () {
