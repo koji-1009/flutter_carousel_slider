@@ -1471,6 +1471,42 @@ void main() {
       expect(identical(controllerBefore, controllerAfter), isTrue);
     });
 
+    testWidgets('a new autoPlayInterval restarts the running timer', (
+      tester,
+    ) async {
+      Widget build(Duration autoPlayInterval) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              autoPlay: true,
+              autoPlayInterval: autoPlayInterval,
+              autoPlayAnimationDuration: const Duration(milliseconds: 100),
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(const Duration(milliseconds: 5000)));
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 600));
+
+      // The original timer would only fire at t=5000ms, well past the end of
+      // this test; the restarted one has to fire at t=900ms.
+      await tester.pumpWidget(build(const Duration(milliseconds: 300)));
+
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+
+      expect(find.text('2'), findsOneWidget);
+    });
+
     testWidgets('recreates the page controller when viewportFraction changes', (
       tester,
     ) async {

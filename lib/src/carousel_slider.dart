@@ -108,6 +108,13 @@ class _CarouselSliderState extends State<CarouselSlider> {
     }
 
     if (oldWidget.options != widget.options) {
+      if (oldWidget.options.autoPlayInterval !=
+          widget.options.autoPlayInterval) {
+        // A running [Timer.periodic] keeps its original interval, so it has to
+        // be thrown away. [_handleAutoPlay] starts a new one below.
+        _clearTimer();
+      }
+
       final isUpdateEnableInfiniteScroll =
           oldWidget.options.enableInfiniteScroll !=
           widget.options.enableInfiniteScroll;
