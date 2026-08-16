@@ -1750,7 +1750,11 @@ void main() {
   });
 
   group('AutoPlay route awareness', () {
-    testWidgets('skips ticks while the carousel route is not current', (
+    // Note: this holds whether or not the `ModalRoute.isCurrent` guard in
+    // `_resumeTimer` is present, because the framework mutes the ticker of a
+    // route that is not current. It pins down the user visible behaviour, not
+    // the guard.
+    testWidgets('does not advance while another route is on top', (
       tester,
     ) async {
       final navigatorKey = GlobalKey<NavigatorState>();

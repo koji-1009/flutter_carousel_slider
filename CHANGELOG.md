@@ -4,6 +4,7 @@
 * Keep the `PageController` and its scroll position when the changed options do not affect it.
 * Remove the `equatable` dependency. `CarouselOptions` no longer exposes `props`.
 * Use `ListenableBuilder` instead of `AnimatedBuilder`.
+* Remove unreachable dead code in `getIndexInLength`.
 
 ## 6.2.0
 
