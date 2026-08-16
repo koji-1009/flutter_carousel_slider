@@ -693,7 +693,7 @@ class CompiledApp {
       uI: (x0,x1) => { x0.height = x1 },
       v: () => new TextDecoder("utf-8", {fatal: false}),
       vB: Function.prototype.call.bind(DataView.prototype.setUint32),
-      vC: x0 => x0.length,
+      vC: (x0,x1) => x0.item(x1),
       vD: x0 => x0.vendor,
       vE: (x0,x1) => { x0.action = x1 },
       vF: x0 => x0.clientX,
@@ -706,7 +706,7 @@ class CompiledApp {
         if (o instanceof Uint32Array) return 1;
         return 2;
       },
-      wC: (x0,x1) => x0.item(x1),
+      wC: x0 => x0.length,
       wD: (x0,x1) => x0.createTextNode(x1),
       wE: (x0,x1) => { x0.method = x1 },
       wF: x0 => x0.changedTouches,
