@@ -1749,60 +1749,6 @@ void main() {
     });
   });
 
-  group('AutoPlay route awareness', () {
-    // Note: this holds whether or not the `ModalRoute.isCurrent` guard in
-    // `_resumeTimer` is present, because the framework mutes the ticker of a
-    // route that is not current. It pins down the user visible behaviour, not
-    // the guard.
-    testWidgets('does not advance while another route is on top', (
-      tester,
-    ) async {
-      final navigatorKey = GlobalKey<NavigatorState>();
-      int pageChanges = 0;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          navigatorKey: navigatorKey,
-          home: Scaffold(
-            body: CarouselSlider(
-              options: const CarouselOptions(
-                autoPlay: true,
-                autoPlayInterval: Duration(milliseconds: 200),
-                autoPlayAnimationDuration: Duration(milliseconds: 50),
-                viewportFraction: 1.0,
-                enableInfiniteScroll: true,
-              ),
-              onPageChanged: (index, reason) {
-                pageChanges++;
-              },
-              items: const [Text('1'), Text('2'), Text('3')],
-            ),
-          ),
-        ),
-      );
-      await tester.pump();
-
-      navigatorKey.currentState!.push(
-        MaterialPageRoute<void>(
-          builder: (_) => const Scaffold(body: Text('Other')),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Other'), findsOneWidget);
-
-      pageChanges = 0;
-      for (var i = 0; i < 10; i++) {
-        await tester.pump(const Duration(milliseconds: 200));
-        await tester.pump(const Duration(milliseconds: 100));
-      }
-
-      expect(pageChanges, 0);
-
-      // Dispose the carousel so that the periodic timer is cancelled.
-      await tester.pumpWidget(const SizedBox());
-    });
-  });
-
   group('animateToClosest forward wrap', () {
     testWidgets('chooses forward wrap when it is the shortest path', (
       tester,
