@@ -101,30 +101,50 @@ class _CarouselSliderState extends State<CarouselSlider> {
   void didUpdateWidget(covariant CarouselSlider oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.carouselController != widget.carouselController) {
+      // Detach the previous controller, then attach the new one so that it can
+      // drive this carousel.
       _carouselController.dispose();
       _setupCarouselControllerX();
     }
 
     if (oldWidget.options != widget.options) {
+      if (oldWidget.options.autoPlayInterval !=
+          widget.options.autoPlayInterval) {
+        // A running [Timer.periodic] keeps its original interval, so it has to
+        // be thrown away. [_handleAutoPlay] starts a new one below.
+        _clearTimer();
+      }
+
       final isUpdateEnableInfiniteScroll =
           oldWidget.options.enableInfiniteScroll !=
           widget.options.enableInfiniteScroll;
       final isUpdateInitialPage =
           oldWidget.options.initialPage != widget.options.initialPage;
-      final initialPage = (isUpdateEnableInfiniteScroll || isUpdateInitialPage)
-          ? _initialPosition
-          : _currentPage.floor();
-      _pageController.dispose();
-      _setupPageController(initialPage);
+      // [PageController.viewportFraction] is final, so the controller has to be
+      // recreated to apply a new value.
+      final isUpdateViewportFraction =
+          oldWidget.options.viewportFraction != widget.options.viewportFraction;
+      final isResetPosition =
+          isUpdateEnableInfiniteScroll || isUpdateInitialPage;
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        // The position is determined at the time of drawing,
-        // so consider the case where there is no position
-        if (_pageController.hasClients) {
-          // Jump to the initial page after the first build
-          _pageController.jumpToPage(initialPage);
-        }
-      });
+      // Every other option is read while building, so the current controller
+      // and its scroll position can be kept as is.
+      if (isResetPosition || isUpdateViewportFraction) {
+        final initialPage = isResetPosition
+            ? _initialPosition
+            : _currentPage.floor();
+        _pageController.dispose();
+        _setupPageController(initialPage);
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          // The position is determined at the time of drawing,
+          // so consider the case where there is no position
+          if (_pageController.hasClients) {
+            // Jump to the initial page after the first build
+            _pageController.jumpToPage(initialPage);
+          }
+        });
+      }
     }
 
     _handleAutoPlay();
@@ -192,8 +212,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
                 : widget.itemCount,
             onPageChanged: (index) {
               final currentPage = getIndexInLength(
-                position: index + _options.initialPage,
-                base: _initialPosition,
+                position: index,
+                base: _initialOffset,
                 length: widget.itemCount,
               );
 
@@ -209,8 +229,8 @@ class _CarouselSliderState extends State<CarouselSlider> {
               final child = widget.itemBuilder != null
                   ? widget.itemBuilder!(context, index, realIndex)
                   : widget.items[index];
-              return AnimatedBuilder(
-                animation: _pageController,
+              return ListenableBuilder(
+                listenable: _pageController,
                 child: child,
                 builder: (context, child) {
                   // `_pageController.page` can only be accessed after the first build,
@@ -287,25 +307,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
 
   void _setupCarouselControllerX() {
     _carouselController = widget.carouselController ?? CarouselControllerX();
-  }
-
-  void _setupPageController(int initialPage) {
-    _currentPage = initialPage.toDouble();
-    _pageController = PageController(
-      viewportFraction: _options.viewportFraction,
-      initialPage: initialPage,
-    );
-    _pageController.addListener(() {
-      final newPage = _pageController.page;
-      if (newPage != null) {
-        _currentPage = newPage;
-        widget.onScrolled?.call(newPage);
-      }
-    });
-
-    final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
+    // The callbacks read [_pageController] and [_options] when they are
+    // invoked, so they stay valid even if either of them is replaced later.
     _carouselController.setupCallbacks(
       onNextPage: (duration, curve) async {
+        final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
         if (isNeedResetTimer) {
           _clearTimer();
         }
@@ -318,6 +324,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
         }
       },
       onPreviousPage: (duration, curve) async {
+        final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
         if (isNeedResetTimer) {
           _clearTimer();
         }
@@ -341,6 +348,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
         _pageController.jumpToPage(pageToJump.floor());
       },
       onAnimateToPage: (page, duration, curve) async {
+        final isNeedResetTimer = _options.pauseAutoPlayOnManualNavigate;
         if (isNeedResetTimer) {
           _clearTimer();
         }
@@ -381,11 +389,24 @@ class _CarouselSliderState extends State<CarouselSlider> {
     );
   }
 
+  void _setupPageController(int initialPage) {
+    _currentPage = initialPage.toDouble();
+    _pageController = PageController(
+      viewportFraction: _options.viewportFraction,
+      initialPage: initialPage,
+    );
+    _pageController.addListener(() {
+      final newPage = _pageController.page;
+      if (newPage != null) {
+        _currentPage = newPage;
+        widget.onScrolled?.call(newPage);
+      }
+    });
+  }
+
   void _clearTimer() {
-    if (_timer != null) {
-      _timer?.cancel();
-      _timer = null;
-    }
+    _timer?.cancel();
+    _timer = null;
   }
 
   void _resumeTimer() {
@@ -427,10 +448,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
       return;
     }
 
-    if (_timer != null) {
-      return;
-    }
-
+    // [_resumeTimer] is a no-op while a timer is already running.
     _resumeTimer();
   }
 }

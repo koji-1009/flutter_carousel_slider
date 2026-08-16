@@ -16,7 +16,8 @@ int getIndexInLength({
 }) {
   if (length == 0) return 0;
 
+  // `%` on int is euclidean, so a negative offset already wraps into
+  // `0 <= result < length`.
   final offset = position - base;
-  final result = offset % length;
-  return result < 0 ? length + result : result;
+  return offset % length;
 }

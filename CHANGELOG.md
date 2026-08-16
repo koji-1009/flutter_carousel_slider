@@ -1,3 +1,12 @@
+## 6.3.0
+
+* Fix `carouselController` not working when it is replaced without changing `options`.
+* Keep the `PageController` and its scroll position when the changed options do not affect it.
+* Fix a new `autoPlayInterval` not being applied while auto play is running.
+* Remove the `equatable` dependency. `CarouselOptions` no longer exposes `props`.
+* Use `ListenableBuilder` instead of `AnimatedBuilder`.
+* Remove unreachable dead code in `getIndexInLength`.
+
 ## 6.2.0
 
 * Flutter 3.32/Dart 3.8

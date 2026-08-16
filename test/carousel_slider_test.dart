@@ -3,6 +3,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+/// The innermost [Transform] wrapping the item that renders [text].
+Transform _transformOf(WidgetTester tester, String text) =>
+    tester.widget<Transform>(
+      find
+          .ancestor(of: find.text(text), matching: find.byType(Transform))
+          .first,
+    );
+
 void main() {
   group('CarouselSlider', () {
     testWidgets('renders items correctly', (tester) async {
@@ -825,9 +833,22 @@ void main() {
 
         expect(find.text('P1'), findsOneWidget);
 
+        // The resulting item is the same either way, so assert the distance
+        // that was actually travelled.
+        final pageBefore = tester
+            .widget<PageView>(find.byType(PageView))
+            .controller!
+            .page!;
+
         controller.animateToPage(9);
         await tester.pumpAndSettle();
 
+        final pageAfter = tester
+            .widget<PageView>(find.byType(PageView))
+            .controller!
+            .page!;
+
+        expect(pageAfter - pageBefore, -2.0);
         expect(lastChangedIndex, 9);
         expect(find.text('P9'), findsOneWidget);
       },
@@ -890,6 +911,120 @@ void main() {
       // Verify the Transform exists and renders
       expect(find.byType(Transform), findsWidgets);
       expect(find.text('Item 1'), findsOneWidget);
+
+      // The item before the center one shrinks towards the center, so it is
+      // anchored on its right edge, and the one after it on its left edge.
+      expect(_transformOf(tester, 'Item 0').alignment, Alignment.centerRight);
+      expect(_transformOf(tester, 'Item 2').alignment, Alignment.centerLeft);
+    });
+
+    testWidgets('Vertical zoom strategy uses correct alignment', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                scrollDirection: Axis.vertical,
+                viewportFraction: 0.7,
+                enlargeCenterPage: true,
+                enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+                initialPage: 1,
+                enableInfiniteScroll: false,
+              ),
+              items: const [Text('Item 0'), Text('Item 1'), Text('Item 2')],
+            ),
+          ),
+        ),
+      );
+
+      expect(_transformOf(tester, 'Item 0').alignment, Alignment.bottomCenter);
+      expect(_transformOf(tester, 'Item 2').alignment, Alignment.topCenter);
+    });
+
+    testWidgets('the side item is scaled down along the easeOut curve', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                viewportFraction: 0.7,
+                enlargeCenterPage: true,
+                enlargeStrategy: CenterPageEnlargeStrategy.scale,
+                enlargeFactor: 0.3,
+                initialPage: 1,
+                enableInfiniteScroll: false,
+              ),
+              items: const [Text('Item 0'), Text('Item 1'), Text('Item 2')],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // The side item sits exactly one page away, so
+      // distortionRatio = 1 - 1 * 0.3.
+      final expected = Curves.easeOut.transform(0.7);
+      expect(expected, isNot(closeTo(0.7, 0.02)));
+      expect(
+        _transformOf(tester, 'Item 0').transform.storage[0],
+        closeTo(expected, 0.01),
+      );
+    });
+
+    testWidgets('enlargeFactor is clamped to 1.0', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                viewportFraction: 1.0,
+                enlargeCenterPage: true,
+                enlargeStrategy: CenterPageEnlargeStrategy.scale,
+                enlargeFactor: 2.0,
+                initialPage: 1,
+                enableInfiniteScroll: false,
+              ),
+              items: const [Text('Item 0'), Text('Item 1'), Text('Item 2')],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Hold the drag so that the centre item sits at a fractional offset,
+      // where an unclamped factor of 2.0 would collapse it to zero.
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(PageView)),
+      );
+      await tester.pump();
+      await gesture.moveBy(const Offset(-30, 0));
+      await tester.pump();
+      await gesture.moveBy(const Offset(-370, 0));
+      await tester.pump();
+
+      final page = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller!
+          .page!;
+      final itemOffset = (page - 1).abs();
+      expect(itemOffset, greaterThan(0.1));
+      expect(itemOffset, lessThan(0.9));
+
+      final expected = Curves.easeOut.transform(
+        (1.0 - itemOffset).clamp(0.0, 1.0),
+      );
+      expect(expected, greaterThan(0.0));
+      expect(
+        _transformOf(tester, 'Item 1').transform.storage[0],
+        closeTo(expected, 0.01),
+      );
+
+      await gesture.up();
+      await tester.pumpAndSettle();
     });
   });
 
@@ -1156,6 +1291,344 @@ void main() {
 
       expect(find.text('2'), findsOneWidget);
     });
+
+    testWidgets('replaced carouselController drives the carousel', (
+      tester,
+    ) async {
+      final first = CarouselControllerX();
+      final second = CarouselControllerX();
+
+      Widget build(CarouselControllerX controller) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: const CarouselOptions(
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+            ),
+            carouselController: controller,
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(first));
+      expect(find.text('1'), findsOneWidget);
+
+      // Swap the controller without touching the options.
+      await tester.pumpWidget(build(second));
+      await tester.pumpAndSettle();
+
+      second.nextPage(duration: const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
+
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('a replaced carouselController stops driving the carousel', (
+      tester,
+    ) async {
+      final first = CarouselControllerX();
+      final second = CarouselControllerX();
+
+      Widget build(CarouselControllerX controller) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: const CarouselOptions(
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+            ),
+            carouselController: controller,
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(first));
+      expect(find.text('1'), findsOneWidget);
+
+      await tester.pumpWidget(build(second));
+      await tester.pumpAndSettle();
+
+      // The detached controller must not move the carousel any more.
+      first.nextPage(duration: const Duration(milliseconds: 100));
+      await tester.pumpAndSettle();
+
+      expect(find.text('1'), findsOneWidget);
+    });
+
+    testWidgets('resets the position when enableInfiniteScroll changes', (
+      tester,
+    ) async {
+      Widget build(bool enableInfiniteScroll) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              viewportFraction: 1.0,
+              enableInfiniteScroll: enableInfiniteScroll,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(false));
+      await tester.pumpAndSettle();
+      expect(find.text('1'), findsOneWidget);
+
+      // Infinite scroll moves the origin of the virtual index, so the position
+      // has to follow it to keep showing the same item.
+      await tester.pumpWidget(build(true));
+      await tester.pumpAndSettle();
+
+      expect(find.text('1'), findsOneWidget);
+    });
+
+    testWidgets('keeps the scroll position when unrelated options change', (
+      tester,
+    ) async {
+      Widget build(Duration autoPlayInterval) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+              autoPlayInterval: autoPlayInterval,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(const Duration(seconds: 4)));
+      await tester.pumpAndSettle();
+
+      // Hold the drag so that the position stays between two pages.
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(PageView)),
+      );
+      await tester.pump();
+      // The first move only has to pass the drag slop.
+      await gesture.moveBy(const Offset(-30, 0));
+      await tester.pump();
+      await gesture.moveBy(const Offset(-170, 0));
+      await tester.pump();
+
+      final pageBefore = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller!
+          .page!;
+      expect(pageBefore, greaterThan(0.0));
+      expect(pageBefore, lessThan(1.0));
+
+      await tester.pumpWidget(build(const Duration(seconds: 2)));
+      await tester.pump();
+
+      final pageAfter = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller!
+          .page!;
+      expect(pageAfter, pageBefore);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('keeps the page controller when unrelated options change', (
+      tester,
+    ) async {
+      Widget build(Duration autoPlayInterval) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+              autoPlayInterval: autoPlayInterval,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(const Duration(seconds: 4)));
+      await tester.pumpAndSettle();
+
+      final controllerBefore = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller;
+
+      await tester.pumpWidget(build(const Duration(seconds: 2)));
+      await tester.pumpAndSettle();
+
+      final controllerAfter = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller;
+
+      expect(identical(controllerBefore, controllerAfter), isTrue);
+    });
+
+    testWidgets('a new autoPlayInterval restarts the running timer', (
+      tester,
+    ) async {
+      Widget build(Duration autoPlayInterval) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              autoPlay: true,
+              autoPlayInterval: autoPlayInterval,
+              autoPlayAnimationDuration: const Duration(milliseconds: 100),
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(const Duration(milliseconds: 5000)));
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 600));
+
+      // The original timer would only fire at t=5000ms, well past the end of
+      // this test; the restarted one has to fire at t=900ms.
+      await tester.pumpWidget(build(const Duration(milliseconds: 300)));
+
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 150));
+
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('recreates the page controller when viewportFraction changes', (
+      tester,
+    ) async {
+      Widget build(double viewportFraction) => MaterialApp(
+        home: Scaffold(
+          body: CarouselSlider(
+            key: const ValueKey('carousel'),
+            options: CarouselOptions(
+              viewportFraction: viewportFraction,
+              enableInfiniteScroll: false,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build(1.0));
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(build(0.5));
+      await tester.pumpAndSettle();
+
+      final controller = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller;
+
+      expect(controller?.viewportFraction, 0.5);
+    });
+  });
+
+  group('pauseAutoPlayOnManualNavigate', () {
+    Widget build({
+      required CarouselControllerX controller,
+      required bool pauseAutoPlayOnManualNavigate,
+    }) => MaterialApp(
+      home: Scaffold(
+        body: CarouselSlider(
+          key: const ValueKey('carousel'),
+          carouselController: controller,
+          options: CarouselOptions(
+            viewportFraction: 1.0,
+            enableInfiniteScroll: false,
+            autoPlay: true,
+            autoPlayInterval: const Duration(milliseconds: 1000),
+            autoPlayAnimationDuration: const Duration(milliseconds: 100),
+            pauseAutoPlayOnManualNavigate: pauseAutoPlayOnManualNavigate,
+          ),
+          items: const [Text('1'), Text('2'), Text('3')],
+        ),
+      ),
+    );
+
+    testWidgets('when true, the auto play timer restarts after navigating', (
+      tester,
+    ) async {
+      final controller = CarouselControllerX();
+
+      await tester.pumpWidget(
+        build(controller: controller, pauseAutoPlayOnManualNavigate: true),
+      );
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+
+      // The timer is cleared here and resumed once the animation completes,
+      // so the next tick is 1000ms after t=500ms.
+      controller.nextPage(duration: const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+      expect(find.text('2'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pumpAndSettle();
+
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('when false, the auto play timer keeps its schedule', (
+      tester,
+    ) async {
+      final controller = CarouselControllerX();
+
+      await tester.pumpWidget(
+        build(controller: controller, pauseAutoPlayOnManualNavigate: false),
+      );
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+
+      controller.nextPage(duration: const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+      expect(find.text('2'), findsOneWidget);
+
+      // The untouched timer still fires at t=1000ms.
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pumpAndSettle();
+
+      expect(find.text('3'), findsOneWidget);
+    });
+
+    testWidgets('takes the current value when the options are updated', (
+      tester,
+    ) async {
+      final controller = CarouselControllerX();
+
+      await tester.pumpWidget(
+        build(controller: controller, pauseAutoPlayOnManualNavigate: false),
+      );
+      await tester.pump();
+
+      await tester.pumpWidget(
+        build(controller: controller, pauseAutoPlayOnManualNavigate: true),
+      );
+      await tester.pump();
+      expect(find.text('1'), findsOneWidget);
+
+      controller.nextPage(duration: const Duration(milliseconds: 500));
+      await tester.pumpAndSettle();
+      expect(find.text('2'), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 700));
+      await tester.pumpAndSettle();
+
+      expect(find.text('2'), findsOneWidget);
+    });
   });
 
   group('PageView passthrough options', () {
@@ -1278,6 +1751,38 @@ void main() {
       expect(() => controller.startAutoPlay(), returnsNormally);
       expect(() => controller.stopAutoPlay(), returnsNormally);
     });
+
+    testWidgets('every callback is detached when the carousel is disposed', (
+      tester,
+    ) async {
+      final controller = CarouselControllerX();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              carouselController: controller,
+              options: const CarouselOptions(
+                viewportFraction: 1.0,
+                enableInfiniteScroll: false,
+              ),
+              items: const [Text('1'), Text('2'), Text('3')],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(const SizedBox());
+
+      // A still attached callback would reach the disposed PageController.
+      expect(() => controller.jumpToPage(2), returnsNormally);
+      expect(controller.nextPage, returnsNormally);
+      expect(controller.previousPage, returnsNormally);
+      expect(() => controller.animateToPage(2), returnsNormally);
+      expect(() => controller.startAutoPlay(), returnsNormally);
+      expect(() => controller.stopAutoPlay(), returnsNormally);
+    });
   });
 
   group('animateToClosest forward wrap', () {
@@ -1314,9 +1819,22 @@ void main() {
 
       expect(find.text('P9'), findsOneWidget);
 
+      // The resulting item is the same either way, so assert the distance
+      // that was actually travelled.
+      final pageBefore = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller!
+          .page!;
+
       controller.animateToPage(0);
       await tester.pumpAndSettle();
 
+      final pageAfter = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller!
+          .page!;
+
+      expect(pageAfter - pageBefore, 1.0);
       expect(lastChangedIndex, 0);
       expect(find.text('P0'), findsOneWidget);
     });
@@ -1395,6 +1913,52 @@ void main() {
 
       expect(pageChanges, greaterThan(0));
     });
+
+    testWidgets(
+      'onPanDown keeps the timer when pauseAutoPlayOnTouch is false',
+      (tester) async {
+        int pageChanges = 0;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: CarouselSlider(
+                options: const CarouselOptions(
+                  autoPlay: true,
+                  autoPlayInterval: Duration(milliseconds: 500),
+                  autoPlayAnimationDuration: Duration(milliseconds: 100),
+                  viewportFraction: 1.0,
+                  enableInfiniteScroll: true,
+                  pauseAutoPlayOnTouch: false,
+                  disableGesture: false,
+                ),
+                onPageChanged: (index, reason) {
+                  pageChanges++;
+                },
+                items: const [Text('Item 1'), Text('Item 2'), Text('Item 3')],
+              ),
+            ),
+          ),
+        );
+
+        // Hold the touch down for longer than the auto play interval.
+        final gesture = await tester.startGesture(
+          tester.getCenter(find.text('Item 1')),
+          kind: PointerDeviceKind.touch,
+        );
+        await tester.pump();
+
+        await tester.pump(const Duration(milliseconds: 600));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 150));
+
+        // The timer was never cleared, so auto play kept going.
+        expect(pageChanges, greaterThan(0));
+
+        await gesture.up();
+        await tester.pumpAndSettle();
+      },
+    );
   });
 
   group('PageStorage', () {
@@ -1503,6 +2067,48 @@ void main() {
 
       // Page should still be at 1 (restored)
       expect(find.text('Page1'), findsOneWidget);
+    });
+
+    testWidgets('the restored position drives the first enlarge pass', (
+      tester,
+    ) async {
+      final bucket = PageStorageBucket();
+      const pageKey = PageStorageKey<String>('carousel_enlarge_restore');
+
+      Widget build() => MaterialApp(
+        home: Scaffold(
+          body: PageStorage(
+            bucket: bucket,
+            child: CarouselSlider(
+              options: const CarouselOptions(
+                pageViewKey: pageKey,
+                enableInfiniteScroll: false,
+                viewportFraction: 1.0,
+                enlargeCenterPage: true,
+                enlargeStrategy: CenterPageEnlargeStrategy.scale,
+                enlargeFactor: 0.3,
+              ),
+              items: const [Text('A'), Text('B'), Text('C')],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(build());
+      await tester.fling(find.text('A'), const Offset(-500, 0), 2000);
+      await tester.pumpAndSettle();
+      expect(find.text('B'), findsOneWidget);
+
+      // Rebuild from scratch. On the very first frame the new PageController
+      // has no clients yet, so the scale has to come from PageStorage rather
+      // than from the initial page.
+      await tester.pumpWidget(const SizedBox());
+      await tester.pumpWidget(build());
+
+      expect(
+        _transformOf(tester, 'B').transform.storage[0],
+        closeTo(1.0, 0.01),
+      );
     });
   });
 
