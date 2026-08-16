@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: "page"
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-slim
