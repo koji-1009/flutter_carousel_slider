@@ -1,4 +1,3 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// Reason for the page change.
@@ -22,7 +21,7 @@ enum CarouselPageChangedReason {
 /// Strategy for enlarging effect.
 enum CenterPageEnlargeStrategy { height, zoom, scale }
 
-class CarouselOptions with Equatable {
+class CarouselOptions {
   const CarouselOptions({
     this.height,
     this.aspectRatio = 16 / 9,
@@ -178,7 +177,39 @@ class CarouselOptions with Equatable {
   final Clip clipBehavior;
 
   @override
-  List<Object?> get props => [
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CarouselOptions &&
+          runtimeType == other.runtimeType &&
+          height == other.height &&
+          aspectRatio == other.aspectRatio &&
+          viewportFraction == other.viewportFraction &&
+          initialPage == other.initialPage &&
+          enableInfiniteScroll == other.enableInfiniteScroll &&
+          animateToClosest == other.animateToClosest &&
+          reverse == other.reverse &&
+          autoPlay == other.autoPlay &&
+          autoPlayInterval == other.autoPlayInterval &&
+          autoPlayAnimationDuration == other.autoPlayAnimationDuration &&
+          autoPlayCurve == other.autoPlayCurve &&
+          enlargeCenterPage == other.enlargeCenterPage &&
+          scrollPhysics == other.scrollPhysics &&
+          pageSnapping == other.pageSnapping &&
+          scrollDirection == other.scrollDirection &&
+          pauseAutoPlayOnTouch == other.pauseAutoPlayOnTouch &&
+          pauseAutoPlayOnManualNavigate ==
+              other.pauseAutoPlayOnManualNavigate &&
+          pauseAutoPlayInFiniteScroll == other.pauseAutoPlayInFiniteScroll &&
+          pageViewKey == other.pageViewKey &&
+          enlargeStrategy == other.enlargeStrategy &&
+          enlargeFactor == other.enlargeFactor &&
+          disableCenter == other.disableCenter &&
+          disableGesture == other.disableGesture &&
+          padEnds == other.padEnds &&
+          clipBehavior == other.clipBehavior;
+
+  @override
+  int get hashCode => Object.hashAll([
     height,
     aspectRatio,
     viewportFraction,
@@ -204,5 +235,5 @@ class CarouselOptions with Equatable {
     disableGesture,
     padEnds,
     clipBehavior,
-  ];
+  ]);
 }
