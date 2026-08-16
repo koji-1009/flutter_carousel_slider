@@ -918,6 +918,52 @@ void main() {
       expect(_transformOf(tester, 'Item 2').alignment, Alignment.centerLeft);
     });
 
+    testWidgets('zoom alignment holds while the carousel is between pages', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CarouselSlider(
+              options: const CarouselOptions(
+                aspectRatio: 2.0,
+                enlargeCenterPage: true,
+                enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+                enlargeFactor: 0.4,
+              ),
+              items: List.generate(5, (i) => Text('Item $i')),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Drag towards the next page and hold, so that `Item 0` sits before the
+      // centre at a fractional offset.
+      final gesture = await tester.startGesture(
+        tester.getCenter(find.byType(PageView)),
+      );
+      await tester.pump();
+      await gesture.moveBy(const Offset(-30, 0));
+      await tester.pump();
+      await gesture.moveBy(const Offset(-270, 0));
+      await tester.pump();
+
+      final page = tester
+          .widget<PageView>(find.byType(PageView))
+          .controller!
+          .page!;
+      expect(page, greaterThan(10000.1));
+      expect(page, lessThan(10000.9));
+
+      // It has to shrink towards the centre for the whole drag, not only once
+      // the offset lands on a whole page.
+      expect(_transformOf(tester, 'Item 0').alignment, Alignment.centerRight);
+
+      await gesture.up();
+      await tester.pumpAndSettle();
+    });
+
     testWidgets('Vertical zoom strategy uses correct alignment', (
       tester,
     ) async {
