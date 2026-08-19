@@ -35,10 +35,10 @@ class CarouselDemo extends StatelessWidget {
         '/ondemand': (ctx) => const OnDemandCarouselDemo(),
         '/indicator': (ctx) => const CarouselWithIndicatorDemo(),
         '/prefetch': (ctx) => const PrefetchImageDemo(),
-        '/reason': (ctx) => const CarouselChangeReasonDemo(),
         '/position': (ctx) => const KeepPageViewPositionDemo(),
         '/multiple': (ctx) => const MultipleItemDemo(),
         '/zoom': (ctx) => const EnlargeStrategyZoomDemo(),
+        '/autoplay': (ctx) => const AutoPlayDemo(),
       },
     );
   }
@@ -82,10 +82,10 @@ class CarouselDemoHome extends StatelessWidget {
           DemoItem('Carousel with indicator controller demo', '/indicator'),
           DemoItem('On-demand carousel slider', '/ondemand'),
           DemoItem('Image carousel slider with prefetch demo', '/prefetch'),
-          DemoItem('Carousel change reason demo', '/reason'),
           DemoItem('Keep PageView position demo', '/position'),
           DemoItem('Multiple item in one screen demo', '/multiple'),
           DemoItem('Enlarge strategy: zoom demo', '/zoom'),
+          DemoItem('Auto play demo', '/autoplay'),
         ],
       ),
     );
@@ -212,21 +212,74 @@ class ComplicatedImageDemo extends StatelessWidget {
   }
 }
 
-class EnlargeStrategyDemo extends StatelessWidget {
+class EnlargeStrategyDemo extends StatefulWidget {
   const EnlargeStrategyDemo({super.key});
+
+  @override
+  State<EnlargeStrategyDemo> createState() => _EnlargeStrategyDemoState();
+}
+
+class _EnlargeStrategyDemoState extends State<EnlargeStrategyDemo> {
+  var _strategy = CenterPageEnlargeStrategy.height;
+
+  static String _describe(CenterPageEnlargeStrategy strategy) =>
+      switch (strategy) {
+        CenterPageEnlargeStrategy.height =>
+          'Shrinks the side items across the scroll axis — their height on a '
+              'horizontal carousel. The extent along the axis belongs to the '
+              'page view and cannot be shrunk.',
+        CenterPageEnlargeStrategy.zoom =>
+          'Scales the side items on both axes, anchored on the edge facing '
+              'the centre so that the slides stay touching.',
+        CenterPageEnlargeStrategy.scale =>
+          'Scales the side items on both axes, anchored on their middle.',
+      };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Complicated image slider demo')),
-      body: CarouselSlider(
-        options: const CarouselOptions(
-          autoPlay: true,
-          aspectRatio: 2.0,
-          enlargeCenterPage: true,
-          enlargeStrategy: CenterPageEnlargeStrategy.height,
-        ),
-        items: imageSliders,
+      appBar: AppBar(title: const Text('Enlarge strategy demo')),
+      body: Column(
+        children: [
+          CarouselSlider(
+            options: CarouselOptions(
+              height: 260,
+              viewportFraction: 0.7,
+              enlargeCenterPage: true,
+              enlargeFactor: 0.4,
+              enlargeStrategy: _strategy,
+            ),
+            items: imageSliders,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                SegmentedButton<CenterPageEnlargeStrategy>(
+                  segments: const [
+                    ButtonSegment(
+                      value: CenterPageEnlargeStrategy.height,
+                      label: Text('height'),
+                    ),
+                    ButtonSegment(
+                      value: CenterPageEnlargeStrategy.zoom,
+                      label: Text('zoom'),
+                    ),
+                    ButtonSegment(
+                      value: CenterPageEnlargeStrategy.scale,
+                      label: Text('scale'),
+                    ),
+                  ],
+                  selected: {_strategy},
+                  onSelectionChanged: (selected) =>
+                      setState(() => _strategy = selected.first),
+                ),
+                const SizedBox(height: 12),
+                Text(_describe(_strategy), textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -408,7 +461,7 @@ class _CarouselWithIndicatorState extends State<CarouselWithIndicatorDemo> {
                   enlargeCenterPage: true,
                   aspectRatio: 2.0,
                 ),
-                onPageChanged: (index, reason) {
+                onPageChanged: (index) {
                   setState(() {
                     _current = index;
                   });
@@ -489,80 +542,6 @@ class _PrefetchImageDemoState extends State<PrefetchImageDemo> {
         itemBuilder: (context, index, realIdx) => ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image.network(images[index], fit: BoxFit.cover, width: 1000),
-        ),
-      ),
-    );
-  }
-}
-
-class CarouselChangeReasonDemo extends StatefulWidget {
-  const CarouselChangeReasonDemo({super.key});
-
-  @override
-  State<CarouselChangeReasonDemo> createState() =>
-      _CarouselChangeReasonDemoState();
-}
-
-class _CarouselChangeReasonDemoState extends State<CarouselChangeReasonDemo> {
-  String reason = '';
-  final _controller = CarouselControllerX();
-
-  void onPageChange(int index, CarouselPageChangedReason changeReason) {
-    setState(() {
-      reason = changeReason.toString();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Change reason demo')),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: CarouselSlider(
-                items: imageSliders,
-                options: const CarouselOptions(
-                  enlargeCenterPage: true,
-                  aspectRatio: 16 / 9,
-                  autoPlay: true,
-                ),
-                onPageChanged: onPageChange,
-                carouselController: _controller,
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flexible(
-                  child: ElevatedButton(
-                    onPressed: () => _controller.previousPage(),
-                    child: const Text('←'),
-                  ),
-                ),
-                Flexible(
-                  child: ElevatedButton(
-                    onPressed: () => _controller.nextPage(),
-                    child: const Text('→'),
-                  ),
-                ),
-                ...Iterable<int>.generate(imgList.length).map(
-                  (int pageIndex) => Flexible(
-                    child: ElevatedButton(
-                      onPressed: () => _controller.animateToPage(pageIndex),
-                      child: Text("$pageIndex"),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Center(
-              child: Column(
-                children: [const Text('page change reason: '), Text(reason)],
-              ),
-            ),
-          ],
         ),
       ),
     );
@@ -656,6 +635,103 @@ class EnlargeStrategyZoomDemo extends StatelessWidget {
           enlargeFactor: 0.4,
         ),
         items: imageSliders,
+      ),
+    );
+  }
+}
+
+class AutoPlayDemo extends StatefulWidget {
+  const AutoPlayDemo({super.key});
+
+  @override
+  State<AutoPlayDemo> createState() => _AutoPlayDemoState();
+}
+
+class _AutoPlayDemoState extends State<AutoPlayDemo> {
+  static const _slow = Duration(seconds: 2);
+  static const _fast = Duration(milliseconds: 500);
+
+  final _controller = CarouselControllerX();
+  var _interval = _slow;
+  var _index = 0;
+  var _slides = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Auto play demo')),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            CarouselSlider(
+              carouselController: _controller,
+              options: CarouselOptions(
+                height: 220,
+                autoPlay: true,
+                autoPlayInterval: _interval,
+                enlargeCenterPage: true,
+              ),
+              onPageChanged: (index) => setState(() {
+                _index = index;
+                _slides++;
+              }),
+              items: imageSliders,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Text('item $_index, $_slides slides so far'),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Rest a finger on the carousel and auto play waits, '
+                    'whether or not the finger ever drags. Letting go gives it '
+                    'a full interval again, and so does either arrow.',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _controller.previousPage(),
+                        child: const Text('←'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => _controller.nextPage(),
+                        child: const Text('→'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => setState(
+                          () => _interval = _interval == _slow ? _fast : _slow,
+                        ),
+                        child: Text('interval: ${_interval.inMilliseconds}ms'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _interval == _fast
+                        ? 'The interval is now shorter than the 800ms slide. '
+                              'A tick that lands mid-slide declines and waits '
+                              'again, so the carousel moves once per 1000ms '
+                              'rather than fighting itself.'
+                        : 'Two seconds between slides, measured from one slide '
+                              'to the next.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

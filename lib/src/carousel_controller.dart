@@ -1,16 +1,29 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-import 'carousel_options.dart';
-
+/// How [CarouselControllerX] asks its carousel to step one page.
+///
+/// Part of [CarouselControllerX.setupCallbacks], which only [CarouselSlider]
+/// is meant to call.
 typedef PageChangeCallback =
     Future<void> Function(Duration duration, Curve curve);
 
+/// How [CarouselControllerX] asks its carousel to jump to an item.
+///
+/// Part of [CarouselControllerX.setupCallbacks], which only [CarouselSlider]
+/// is meant to call.
 typedef JumpToCallback = void Function(int page);
 
+/// How [CarouselControllerX] asks its carousel to animate to an item.
+///
+/// Part of [CarouselControllerX.setupCallbacks], which only [CarouselSlider]
+/// is meant to call.
 typedef AnimateToPageCallback =
     Future<void> Function(int page, Duration duration, Curve curve);
 
 /// Controller to operate the [CarouselSlider]. It interacts with the widget through callbacks.
+///
+/// One controller drives one carousel: handing the same instance to two
+/// carousels leaves the later-built one in charge. Give each carousel its own.
 class CarouselControllerX {
   /// Creates a new [CarouselControllerX].
   CarouselControllerX();
@@ -19,8 +32,6 @@ class CarouselControllerX {
   PageChangeCallback? _onPreviousPageCallback;
   JumpToCallback? _onJumpToPageCallback;
   AnimateToPageCallback? _onAnimateToPageCallback;
-  VoidCallback? _onStartAutoPlayCallback;
-  VoidCallback? _onStopAutoPlayCallback;
 
   /// Disposes the controller.
   void dispose() {
@@ -28,8 +39,6 @@ class CarouselControllerX {
     _onPreviousPageCallback = null;
     _onJumpToPageCallback = null;
     _onAnimateToPageCallback = null;
-    _onStartAutoPlayCallback = null;
-    _onStopAutoPlayCallback = null;
   }
 
   /// Sets up the callbacks for the controller.
@@ -40,15 +49,11 @@ class CarouselControllerX {
     required PageChangeCallback onPreviousPage,
     required JumpToCallback onJumpToPage,
     required AnimateToPageCallback onAnimateToPage,
-    required VoidCallback onStartAutoPlay,
-    required VoidCallback onStopAutoPlay,
   }) {
     _onNextPageCallback = onNextPage;
     _onPreviousPageCallback = onPreviousPage;
     _onJumpToPageCallback = onJumpToPage;
     _onAnimateToPageCallback = onAnimateToPage;
-    _onStartAutoPlayCallback = onStartAutoPlay;
-    _onStopAutoPlayCallback = onStopAutoPlay;
   }
 
   /// Animates the controlled [CarouselSlider] to the next page.
@@ -75,8 +80,17 @@ class CarouselControllerX {
 
   /// Changes which page is displayed in the controlled [CarouselSlider].
   ///
-  /// Jumps the page position from its current value to the given value,
-  /// without animation, and without checking if the new value is in range.
+  /// Jumps the page position from its current value to the given value, without
+  /// animation.
+  ///
+  /// [page] is an item index. One outside `[0, itemCount)` names no slide, so
+  /// it wraps on a carousel with `enableInfiniteScroll` and is clamped on any
+  /// other rather than leaving the carousel showing nothing.
+  ///
+  /// It is resolved against the list the carousel currently has. Calling this
+  /// in the same breath as the `setState` that lengthens that list asks for an
+  /// item the carousel has not been given yet, and lands on the last one it
+  /// has; make the call from the frame after instead.
   void jumpToPage(int page) {
     _onJumpToPageCallback?.call(page);
   }
@@ -85,27 +99,14 @@ class CarouselControllerX {
   ///
   /// The animation lasts for the given duration and follows the given curve.
   /// The returned [Future] resolves when the animation completes.
+  ///
+  /// [page] is an item index, brought into range the same way
+  /// [jumpToPage] brings it.
   Future<void> animateToPage(
     int page, {
     Duration duration = const Duration(milliseconds: 300),
     Curve curve = Curves.linear,
   }) async {
     await _onAnimateToPageCallback?.call(page, duration, curve);
-  }
-
-  /// Starts the controlled [CarouselSlider] autoplay.
-  ///
-  /// The carousel will only autoPlay if the [autoPlay] parameter
-  /// in [CarouselOptions] is true.
-  void startAutoPlay() {
-    _onStartAutoPlayCallback?.call();
-  }
-
-  /// Stops the controlled [CarouselSlider] from autoplaying.
-  ///
-  /// This is a more on-demand way of doing this. Use the [autoPlay]
-  /// parameter in [CarouselOptions] to specify the autoPlay behaviour of the carousel.
-  void stopAutoPlay() {
-    _onStopAutoPlayCallback?.call();
   }
 }
