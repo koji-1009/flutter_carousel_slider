@@ -14,7 +14,11 @@ void main() {
     });
 
     test('handles offset correctly', () {
-      expect(getIndexInLength(position: 10, base: 5, length: 10), 5);
+      // Asymmetric on purpose: `position - base` and `base - position` agree
+      // modulo the length whenever the gap is half of it, so a symmetric case
+      // cannot tell the subtraction from its reverse.
+      expect(getIndexInLength(position: 10, base: 3, length: 10), 7);
+      expect(getIndexInLength(position: 3, base: 10, length: 10), 3);
     });
 
     test('handles wrap around (positive)', () {

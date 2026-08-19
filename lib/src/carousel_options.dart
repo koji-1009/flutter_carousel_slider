@@ -1,27 +1,66 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/widgets.dart';
 
-/// Reason for the page change.
-enum CarouselPageChangedReason {
-  /// The page change was triggered by auto play.
-  timed,
+/// How [CarouselOptions.enlargeCenterPage] makes the centre page stand out.
+enum CenterPageEnlargeStrategy {
+  /// Shrinks the side items' boxes across the scroll axis — their height on a
+  /// horizontal carousel and their width on a vertical one, despite the name.
+  ///
+  /// The extent along the scroll axis cannot be shrunk: the page view pins it
+  /// to `viewport * viewportFraction` whatever the box asks for. A slide that
+  /// fills its box shrinks with it; one with an intrinsic size of its own keeps
+  /// that size for as long as it fits inside the shrunken box, and is squeezed
+  /// into it once it does not.
+  height,
 
-  /// The page change was triggered by user gesture.
-  manual,
+  /// Scales each side item down on both axes, anchored on the edge facing the
+  /// centre so that the slides stay touching.
+  zoom,
 
-  /// The page change was triggered by a call to [CarouselControllerX].
-  controller,
-
-  /// The page change was triggered by restore page with [PageStorageKey].
-  @Deprecated(
-    'This value is no longer used and will be removed in a future version.',
-  )
-  restore,
+  /// Scales each side item down on both axes, anchored on its middle.
+  scale,
 }
 
-/// Strategy for enlarging effect.
-enum CenterPageEnlargeStrategy { height, zoom, scale }
-
+/// Everything about a [CarouselSlider] except what it shows.
+///
+/// Immutable and `const`-constructible: build a new one and rebuild the
+/// carousel to change any of it.
+///
+/// Changing [initialPage] or [enableInfiniteScroll] puts the reader back on
+/// [initialPage] — both say where the carousel starts, so both start it again.
+///
+/// Two are meant to be set once rather than switched at runtime: changing
+/// [pageViewKey], or swapping [height] for [aspectRatio], rebuilds the page
+/// view from scratch and loses the reader's place along with anything inside a
+/// slide.
 class CarouselOptions {
+  /// Every [PointerDeviceKind], the default for [dragDevices].
+  ///
+  /// A carousel is paged by a swipe, and there is no kind that should be left
+  /// out of it. Per kind:
+  ///
+  /// * [PointerDeviceKind.touch], [PointerDeviceKind.stylus] and
+  ///   [PointerDeviceKind.invertedStylus] are direct manipulation.
+  /// * [PointerDeviceKind.trackpad] swipes with two fingers.
+  /// * [PointerDeviceKind.mouse] is the only pointer affordance left on the web
+  ///   and on desktop, because a carousel hides its scrollbar and a horizontal
+  ///   one does not answer a vertical wheel.
+  /// * [PointerDeviceKind.unknown] is what assistive tooling such as
+  ///   VoiceAccess reports.
+  ///
+  /// Listed out rather than derived from [PointerDeviceKind.values], because
+  /// the set has to be a constant.
+  static const defaultDragDevices = <PointerDeviceKind>{
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.invertedStylus,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.unknown,
+  };
+
+  /// Creates the options for a [CarouselSlider].
   const CarouselOptions({
     this.height,
     this.aspectRatio = 16 / 9,
@@ -38,17 +77,25 @@ class CarouselOptions {
     this.scrollPhysics,
     this.pageSnapping = true,
     this.scrollDirection = Axis.horizontal,
-    this.pauseAutoPlayOnTouch = true,
-    this.pauseAutoPlayOnManualNavigate = true,
-    this.pauseAutoPlayInFiniteScroll = false,
     this.pageViewKey,
     this.enlargeStrategy = CenterPageEnlargeStrategy.scale,
     this.enlargeFactor = 0.3,
     this.disableCenter = false,
-    this.disableGesture = false,
+    this.dragDevices = defaultDragDevices,
     this.padEnds = true,
     this.clipBehavior = Clip.hardEdge,
-  });
+  }) : assert(
+         aspectRatio > 0,
+         'CarouselOptions.aspectRatio must be greater than zero.',
+       ),
+       assert(
+         height == null || height >= 0,
+         'CarouselOptions.height must not be negative.',
+       ),
+       assert(
+         viewportFraction > 0,
+         'CarouselOptions.viewportFraction must be greater than zero.',
+       );
 
   /// Set carousel height and overrides any existing [aspectRatio].
   final double? height;
@@ -64,6 +111,9 @@ class CarouselOptions {
   final double viewportFraction;
 
   /// The initial page to show when first creating the [CarouselSlider].
+  ///
+  /// An item index. One outside `[0, itemCount)` names no slide, so it wraps on
+  /// a carousel with [enableInfiniteScroll] and is clamped on any other.
   ///
   /// Defaults to 0.
   final int initialPage;
@@ -89,13 +139,30 @@ class CarouselOptions {
   /// Defaults to false.
   final bool autoPlay;
 
-  /// Sets Duration to determent the frequency of slides when
+  /// How often the carousel moves itself, measured from one slide to the next.
   ///
-  /// [autoPlay] is set to true.
+  /// Auto play never competes with a movement already under way: a tick that
+  /// lands while the carousel is moving or held declines and waits another
+  /// interval. So if [autoPlayAnimationDuration] is as long as this interval
+  /// or longer, the period grows to the next whole multiple that clears it —
+  /// 300ms with an 800ms animation slides every 900ms, not every 300ms.
+  ///
+  /// A finger resting on the carousel holds it too, whether or not it ever
+  /// becomes a drag, so a slide is never pulled out from under a press.
+  ///
+  /// Three things restart the wait rather than merely postponing a tick:
+  /// letting go of a press, any [CarouselControllerX] call, and a rebuild that
+  /// changes [autoPlay] or [autoPlayInterval]. A mouse wheel notch does not —
+  /// it only holds off the ticks that land while it is still settling.
+  ///
+  /// Must be greater than zero.
+  ///
   /// Defaults to 4 seconds.
   final Duration autoPlayInterval;
 
   /// The animation duration between two transitioning pages while in auto playback.
+  ///
+  /// Must be greater than zero.
   ///
   /// Defaults to 800 ms.
   final Duration autoPlayAnimationDuration;
@@ -124,6 +191,8 @@ class CarouselOptions {
   /// The physics are modified to snap to page boundaries using
   /// [PageScrollPhysics] prior to being used.
   ///
+  /// Ignored below two items, where the carousel refuses to scroll at all.
+  ///
   /// Defaults to matching platform conventions.
   final ScrollPhysics? scrollPhysics;
 
@@ -132,40 +201,44 @@ class CarouselOptions {
   /// Default to `true`.
   final bool pageSnapping;
 
-  /// If `true`, the auto play function will be paused when user is interacting with
-  /// the carousel, and will be resumed when user finish interacting.
-  /// Default to `true`.
-  final bool pauseAutoPlayOnTouch;
-
-  /// If `true`, the auto play function will be paused when user is calling
-  /// pageController's `nextPage` or `previousPage` or `animateToPage` method.
-  /// And after the animation complete, the auto play will be resumed.
-  /// Default to `true`.
-  final bool pauseAutoPlayOnManualNavigate;
-
-  /// If `enableInfiniteScroll` is `false`, and `autoPlay` is `true`, this option
-  /// decide the carousel should go to the first item when it reach the last item or not.
-  /// If set to `true`, the auto play will be paused when it reach the last item.
-  /// If set to `false`, the auto play function will animate to the first item when it was
-  /// in the last item.
-  final bool pauseAutoPlayInFiniteScroll;
-
-  /// Pass a [PageStorageKey] if you want to keep the PageView's position when it was recreated.
+  /// Pass a [PageStorageKey] if you want to keep the PageView's position when
+  /// it was recreated.
+  ///
+  /// This restores a position when the carousel is built anew — pushed over and
+  /// popped back to, say.
   final PageStorageKey<Object>? pageViewKey;
 
-  /// Use [enlargeStrategy] to determine which method to enlarge the center page.
+  /// How the centre page is made to stand out.
+  ///
+  /// [CenterPageEnlargeStrategy.height] shrinks the side items' boxes across
+  /// the scroll axis — their height on a horizontal carousel, their width on a
+  /// vertical one, despite the name. It cannot shrink them along the scroll
+  /// axis, because the page view pins that extent to
+  /// `viewport * viewportFraction` whatever the box asks for.
+  ///
+  /// The other two scale the slide itself, on both axes.
   final CenterPageEnlargeStrategy enlargeStrategy;
 
   /// How much the pages next to the center page will be scaled down.
-  /// If `enlargeCenterPage` is false, this property has no effect.
+  /// If [enlargeCenterPage] is false, this property has no effect.
   final double enlargeFactor;
 
   /// Whether or not to disable the `Center` widget for each slide.
   final bool disableCenter;
 
-  /// A flag to customize gestures within the items displayed in the carousel.
-  /// Setting it to true will disable gestures for [CarouselSlider].
-  final bool disableGesture;
+  /// The device kinds that can page the carousel by dragging it.
+  ///
+  /// Defaults to [defaultDragDevices]. This replaces the set of an enclosing
+  /// [ScrollConfiguration] rather than inheriting from it, so
+  /// `{PointerDeviceKind.touch}` accepts touch and nothing else.
+  ///
+  /// This governs dragging only. A mouse wheel is routed past
+  /// [ScrollBehavior.dragDevices] by [Scrollable], and [CarouselControllerX]
+  /// and auto play do not consult it, so an empty set means "nothing can drag
+  /// this" rather than "nothing can move this". To refuse every kind of user
+  /// input, including the wheel, use
+  /// `scrollPhysics: const NeverScrollableScrollPhysics()`.
+  final Set<PointerDeviceKind> dragDevices;
 
   /// Whether to add padding to both ends of the list.
   /// If this is set to true and [viewportFraction] < 1.0, padding will be added such that the first and last child slivers will be in the center of the viewport when scrolled all the way to the start or end, respectively.
@@ -196,15 +269,11 @@ class CarouselOptions {
           scrollPhysics == other.scrollPhysics &&
           pageSnapping == other.pageSnapping &&
           scrollDirection == other.scrollDirection &&
-          pauseAutoPlayOnTouch == other.pauseAutoPlayOnTouch &&
-          pauseAutoPlayOnManualNavigate ==
-              other.pauseAutoPlayOnManualNavigate &&
-          pauseAutoPlayInFiniteScroll == other.pauseAutoPlayInFiniteScroll &&
           pageViewKey == other.pageViewKey &&
           enlargeStrategy == other.enlargeStrategy &&
           enlargeFactor == other.enlargeFactor &&
           disableCenter == other.disableCenter &&
-          disableGesture == other.disableGesture &&
+          setEquals(dragDevices, other.dragDevices) &&
           padEnds == other.padEnds &&
           clipBehavior == other.clipBehavior;
 
@@ -225,14 +294,11 @@ class CarouselOptions {
     scrollPhysics,
     pageSnapping,
     scrollDirection,
-    pauseAutoPlayOnTouch,
-    pauseAutoPlayOnManualNavigate,
-    pauseAutoPlayInFiniteScroll,
     pageViewKey,
     enlargeStrategy,
     enlargeFactor,
     disableCenter,
-    disableGesture,
+    Object.hashAllUnordered(dragDevices),
     padEnds,
     clipBehavior,
   ]);

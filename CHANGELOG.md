@@ -1,3 +1,42 @@
+## 7.0.0
+
+### Breaking
+
+* Auto play has one rule: `autoPlayInterval` is the period between slides, and a tick that lands while the carousel is held or already moving waits for the next one. `pauseAutoPlayOnTouch`, `pauseAutoPlayOnManualNavigate`, `pauseAutoPlayInFiniteScroll`, `CarouselControllerX.startAutoPlay` and `stopAutoPlay` are removed. A finite carousel always wraps; to stop at the last item, watch `onPageChanged` and rebuild with `autoPlay: false`.
+* `CarouselPageChangedReason` is removed; `onPageChanged` is now `void Function(int index)`.
+* `CarouselOptions.disableGesture` is removed. Use `scrollPhysics: const NeverScrollableScrollPhysics()`.
+* Drags are accepted from every `PointerDeviceKind`, not just touch and mouse. Narrow the set with the new `CarouselOptions.dragDevices`.
+* A drag moves the carousel from its first pixel; the removed `GestureDetector` used to discard the first ~20px.
+* `jumpToPage`, `animateToPage` and `initialPage` bring an out-of-range page into range — wrapping when `enableInfiniteScroll` is on, clamping otherwise.
+* A carousel with one item no longer scrolls, and `scrollPhysics` is ignored at that size.
+* `CarouselControllerX.setupCallbacks` loses its `onStartAutoPlay` and `onStopAutoPlay` parameters.
+
+### Fixed
+
+* `CenterPageEnlargeStrategy.height` did nothing at all. It now shrinks the side items across the scroll axis.
+* `CenterPageEnlargeStrategy.zoom` anchored side items away from the centre under `reverse` and under a right-to-left `Directionality`.
+* An infinite carousel built before its items arrived could not scroll backwards afterwards; a finite one ignored `initialPage`.
+* A `viewportFraction` change emitted `onScrolled` from inside the build phase, so a `setState` made from it threw.
+* Auto play fought its own slide when `autoPlayInterval` was shorter than `autoPlayAnimationDuration`, and did not wait for a swipe. With `padEnds: false` and a `viewportFraction` below 1 it also stopped at the last item: the position cannot reach a whole `itemCount - 1` there, so the wrap never fired.
+* `onPageChanged` went silent when the list changed length under the reader, leaving the last index it reported naming an item that was no longer there.
+* `CarouselControllerX.nextPage` and `previousPage` moved a carousel with one item, which has nowhere to go.
+* A `CarouselControllerX` you own was cleared when its carousel was disposed, leaving a replacement carousel undrivable.
+* The carousel could be left with its position past the end it can reach, drawing nothing there.
+* `const CarouselSlider(items: [...])` did not compile.
+* `CarouselSlider` threw when built without a `PageStorage` ancestor.
+* Every visible slide was built twice at mount.
+* The README's carousel controller sample used the removed `RaisedButton` and an undefined variable.
+
+### Other
+
+* Imports `package:flutter/widgets.dart` rather than `package:flutter/material.dart`.
+* `onScrolled` reports the page view's own position — fractional, and counting from a virtual offset on an infinite carousel. `onPageChanged` reports an item index.
+* `dragDevices` governs dragging only: a mouse wheel is routed past it by `Scrollable`, and controller calls and auto play do not consult it.
+* `pageViewKey` and the `height`/`aspectRatio` pair are meant to be set once. Changing either while the carousel is on screen rebuilds the page view and loses the reader's place.
+* Asserts on `aspectRatio`, `viewportFraction`, `height`, `CarouselSlider.builder`'s `itemCount`, and both auto play durations.
+* Stops following the scroll position when `enlargeCenterPage` is off.
+* The semantics tree no longer advertises `scrollUp`/`scrollDown` on a horizontal carousel.
+
 ## 6.3.0
 
 * Fix `carouselController` not working when it is replaced without changing `options`.
