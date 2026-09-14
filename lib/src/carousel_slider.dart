@@ -459,9 +459,10 @@ class _CarouselSliderState extends State<CarouselSlider> {
                       : _pageController.initialPage.toDouble();
                 }
 
+                // How far the enlarge strategy shrinks this item, whichever
+                // strategy it is. One — no effect — unless `enlargeCenterPage`
+                // is on.
                 var scale = 1.0;
-                // if `enlargeCenterPage` is true, we must calculate the carousel item's height
-                // to display the visual effect
                 final itemOffset = currentPageValue - realIndex;
                 if (_options.enlargeCenterPage) {
                   final enlargeFactor = _options.enlargeFactor.clamp(0.0, 1.0);

@@ -6,7 +6,7 @@
 ///
 /// For example; We have a Carousel of 10000(simulating infinity) but only 6 images.
 /// We need to repeat the images to give the illusion of a never ending stream.
-/// By calling _getRealIndex with position and base we get an offset.
+/// By calling getIndexInLength with position and base we get an offset.
 /// This offset modulo our length, 6, will return a number between 0 and 5, which represent the image
 /// to be placed in the given position.
 int getIndexInLength({

@@ -243,7 +243,7 @@ class CarouselOptions {
   /// Whether to add padding to both ends of the list.
   /// If this is set to true and [viewportFraction] < 1.0, padding will be added such that the first and last child slivers will be in the center of the viewport when scrolled all the way to the start or end, respectively.
   /// If [viewportFraction] >= 1.0, this property has no effect.
-  /// This property defaults to true and must not be null.
+  /// This property defaults to true.
   final bool padEnds;
 
   /// Exposed clipBehavior of PageView
