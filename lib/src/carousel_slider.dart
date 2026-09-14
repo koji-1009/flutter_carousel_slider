@@ -595,10 +595,11 @@ class _CarouselSliderState extends State<CarouselSlider> {
     _ownsCarouselController = widget.carouselController == null;
     final controller = widget.carouselController ?? CarouselControllerX();
     _carouselController = controller;
-    // Whether this carousel still answers to [controller]. A borrowed
-    // controller that has been taken off keeps these callbacks until another
-    // carousel installs its own, and they must not move this one meanwhile.
-    bool isCurrent() => identical(_carouselController, controller);
+    // Each callback first checks that this carousel still answers to
+    // [controller]. A borrowed controller that has been taken off keeps these
+    // callbacks until another carousel installs its own, and they must not move
+    // this one meanwhile.
+    //
     // The callbacks read [_pageController] and [_options] when they are
     // invoked, so they stay valid even if either of them is replaced later.
     controller.setupCallbacks(
@@ -611,21 +612,25 @@ class _CarouselSliderState extends State<CarouselSlider> {
       // instead steps to the next whole slot, because it is keeping a cadence
       // rather than answering "the one after this".
       onNextPage: (duration, curve) {
-        if (!isCurrent() || !_canDrive || widget.itemCount <= 1) {
+        if (!identical(_carouselController, controller) ||
+            !_canDrive ||
+            widget.itemCount <= 1) {
           return Future<void>.value();
         }
         _scheduleTick();
         return _pageController.nextPage(duration: duration, curve: curve);
       },
       onPreviousPage: (duration, curve) {
-        if (!isCurrent() || !_canDrive || widget.itemCount <= 1) {
+        if (!identical(_carouselController, controller) ||
+            !_canDrive ||
+            widget.itemCount <= 1) {
           return Future<void>.value();
         }
         _scheduleTick();
         return _pageController.previousPage(duration: duration, curve: curve);
       },
       onJumpToPage: (page) {
-        if (!isCurrent() || !_canDrive) return;
+        if (!identical(_carouselController, controller) || !_canDrive) return;
         _scheduleTick();
         final target = _resolvePage(page);
         final currentPage =
@@ -645,7 +650,7 @@ class _CarouselSliderState extends State<CarouselSlider> {
         _clampAfterLayout();
       },
       onAnimateToPage: (page, duration, curve) async {
-        if (!isCurrent() || !_canDrive) return;
+        if (!identical(_carouselController, controller) || !_canDrive) return;
         _scheduleTick();
         final target = _resolvePage(page);
         final currentPage =
