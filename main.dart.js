@@ -7474,9 +7474,12 @@ _.c=c
 _.d=d},
 a8m:function a8m(a){this.a=a},
 a8n:function a8n(a){this.a=a},
-a8d:function a8d(a){this.a=a},
-a8e:function a8e(a){this.a=a},
-a8f:function a8f(a){this.a=a},
+a8d:function a8d(a,b){this.a=a
+this.b=b},
+a8e:function a8e(a,b){this.a=a
+this.b=b},
+a8f:function a8f(a,b){this.a=a
+this.b=b},
 a8h:function a8h(a){this.a=a},
 a8g:function a8g(a,b){this.a=a
 this.b=b},
@@ -37439,10 +37442,9 @@ s=s.f
 return s.length===1?t.gQ.a(B.b.gbu(s)).gqA():null},
 aV(a){var s,r,q,p,o,n,m=this
 m.ba(a)
-if(a.r!=m.a.r){s=m.f
+if(a.r!=m.a.r){if(m.y){s=m.f
 s===$&&A.a()
-s.l()
-m.Kd()}s=a.f
+s.l()}m.Kd()}s=a.f
 r=m.a.f
 if(s.w===r.w)r=s.x.a!==r.x.a
 else r=!0
@@ -37537,9 +37539,9 @@ Kd(){var s=this,r=s.a.r,q=r==null
 s.y=q
 if(q)r=new A.oo()
 s.f=r
-r.a=new A.a8d(s)
-r.b=new A.a8e(s)
-r.d=new A.a8f(s)},
+r.a=new A.a8d(s,r)
+r.b=new A.a8e(s,r)
+r.d=new A.a8f(s,r)},
 ze(a){var s,r
 if(this.a.gbO()<=0)return 0
 s=this.a
@@ -37671,52 +37673,56 @@ A.a8n.prototype={
 $1(a){return this.a.d.E(0,a.gb6())},
 $S:117}
 A.a8d.prototype={
-$2(a,b){var s,r=this.a
-if(!r.gxg()||r.a.gbO()<=1)return A.dh(null,t.H)
-r.l5()
-r=r.r
+$2(a,b){var s=this.a,r=s.f
 r===$&&A.a()
-s=t.gQ.a(B.b.gbu(r.f)).gqA()
-s.toString
-return r.tP(B.c.ah(s)+1,b,a)},
+if(r!==this.b||!s.gxg()||s.a.gbO()<=1)return A.dh(null,t.H)
+s.l5()
+s=s.r
+s===$&&A.a()
+r=t.gQ.a(B.b.gbu(s.f)).gqA()
+r.toString
+return s.tP(B.c.ah(r)+1,b,a)},
 $S:116}
 A.a8e.prototype={
-$2(a,b){var s,r=this.a
-if(!r.gxg()||r.a.gbO()<=1)return A.dh(null,t.H)
-r.l5()
-r=r.r
+$2(a,b){var s=this.a,r=s.f
 r===$&&A.a()
-s=t.gQ.a(B.b.gbu(r.f)).gqA()
-s.toString
-return r.tP(B.c.ah(s)-1,b,a)},
+if(r!==this.b||!s.gxg()||s.a.gbO()<=1)return A.dh(null,t.H)
+s.l5()
+s=s.r
+s===$&&A.a()
+r=t.gQ.a(B.b.gbu(s.f)).gqA()
+r.toString
+return s.tP(B.c.ah(r)-1,b,a)},
 $S:116}
 A.a8f.prototype={
 $3(a,b,c){return this.Qv(a,b,c)},
 Qv(a,b,c){var s=0,r=A.R(t.H),q,p=this,o,n,m,l,k,j,i,h
 var $async$$3=A.S(function(d,e){if(d===1)return A.O(e,r)
-for(;;)switch(s){case 0:h=p.a
-if(!h.gxg()){s=1
-break}h.l5()
-o=h.ze(a)
-n=h.gl_()
-m=n==null?null:B.c.hf(n)
-if(m==null){n=h.r
-n===$&&A.a()
-m=n.as}n=h.a
-n.toString
-n=n.f.e&&n.gbO()>0?1e4:0
-l=A.Qe(n,h.a.gbO(),m)
-k=o-l
-n=h.a
-j=n.f
-if(j.e){i=Math.abs(k)
-n=n.gbO()
-j=h.a.gbO()
-if(i>Math.abs(o+n-l))k=o+h.a.gbO()-l
-else if(i>Math.abs(o-j-l))k=o-h.a.gbO()-l}h=h.r
+for(;;)switch(s){case 0:i=p.a
+h=i.f
 h===$&&A.a()
+if(h!==p.b||!i.gxg()){s=1
+break}i.l5()
+o=i.ze(a)
+h=i.gl_()
+n=h==null?null:B.c.hf(h)
+if(n==null){h=i.r
+h===$&&A.a()
+n=h.as}h=i.a
+h.toString
+h=h.f.e&&h.gbO()>0?1e4:0
+m=A.Qe(h,i.a.gbO(),n)
+l=o-m
+h=i.a
+k=h.f
+if(k.e){j=Math.abs(l)
+h=h.gbO()
+k=i.a.gbO()
+if(j>Math.abs(o+h-m))l=o+i.a.gbO()-m
+else if(j>Math.abs(o-k-m))l=o-i.a.gbO()-m}i=i.r
+i===$&&A.a()
 s=3
-return A.N(h.tP(m+k,c,b),$async$$3)
+return A.N(i.tP(n+l,c,b),$async$$3)
 case 3:case 1:return A.P(q,r)}})
 return A.Q($async$$3,r)},
 $S:317}
