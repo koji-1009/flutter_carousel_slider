@@ -132,6 +132,7 @@ Forked and renamed the library.
 * Move the following properties from `CarouselSlider` to `CarouselOptions`
     * `disableGesture`
 * Change `CarouselOptions` to immutable class
+* Remove `CarouselOptions.copyWith`
 * Nullability cleanup
 * Cleanup state management
 * Recreate example project by Flutter 3.22
