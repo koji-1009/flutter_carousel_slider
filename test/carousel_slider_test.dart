@@ -3915,6 +3915,90 @@ void main() {
       expect(find.text('1'), findsOneWidget);
     });
 
+    group('a borrowed carouselController moved to another carousel', () {
+      Widget carousel(Key key, CarouselControllerX? controller) =>
+          CarouselSlider(
+            key: key,
+            carouselController: controller,
+            options: const CarouselOptions(
+              height: 100,
+              viewportFraction: 1.0,
+              enableInfiniteScroll: false,
+            ),
+            items: const [Text('1'), Text('2'), Text('3')],
+          );
+
+      Widget build(List<Widget> children) => MaterialApp(
+        home: Scaffold(body: Column(children: children)),
+      );
+
+      double? pageOf(WidgetTester tester, Key key) => tester
+          .widget<PageView>(
+            find.descendant(
+              of: find.byKey(key),
+              matching: find.byType(PageView),
+            ),
+          )
+          .controller!
+          .page;
+
+      const a = ValueKey('A');
+      const b = ValueKey('B');
+
+      for (final receiverFirst in [true, false]) {
+        testWidgets('drives the receiver when it sits '
+            '${receiverFirst ? 'before' : 'after'} the giver', (tester) async {
+          final moved = CarouselControllerX();
+          final replacement = CarouselControllerX();
+
+          List<Widget> order(Widget giver, Widget receiver) =>
+              receiverFirst ? [receiver, giver] : [giver, receiver];
+
+          await tester.pumpWidget(
+            build(order(carousel(a, moved), carousel(b, null))),
+          );
+          await tester.pumpAndSettle();
+
+          await tester.pumpWidget(
+            build(order(carousel(a, replacement), carousel(b, moved))),
+          );
+          await tester.pumpAndSettle();
+
+          moved.jumpToPage(2);
+          await tester.pumpAndSettle();
+
+          expect(pageOf(tester, b), 2.0);
+          expect(pageOf(tester, a), 0.0);
+
+          replacement.jumpToPage(1);
+          await tester.pumpAndSettle();
+
+          expect(pageOf(tester, a), 1.0);
+          expect(pageOf(tester, b), 2.0);
+        });
+      }
+
+      testWidgets('taken off without a new carousel moves nothing', (
+        tester,
+      ) async {
+        final borrowed = CarouselControllerX();
+
+        await tester.pumpWidget(build([carousel(a, borrowed)]));
+        await tester.pumpAndSettle();
+
+        await tester.pumpWidget(build([carousel(a, null)]));
+        await tester.pumpAndSettle();
+
+        borrowed.jumpToPage(2);
+        await borrowed.animateToPage(1);
+        await borrowed.nextPage();
+        await borrowed.previousPage();
+        await tester.pumpAndSettle();
+
+        expect(pageOf(tester, a), 0.0);
+      });
+    });
+
     testWidgets('resets the position when enableInfiniteScroll changes', (
       tester,
     ) async {
