@@ -119,6 +119,7 @@
 ## 5.0.1
 
 * Support equatability for `CarouselOptions`
+* Remove `CarouselOptions.copyWith`
 * Fix `didUpdateWidget` for `CarouselSlider`
 
 ## 5.0.0
@@ -132,7 +133,6 @@ Forked and renamed the library.
 * Move the following properties from `CarouselSlider` to `CarouselOptions`
     * `disableGesture`
 * Change `CarouselOptions` to immutable class
-* Remove `CarouselOptions.copyWith`
 * Nullability cleanup
 * Cleanup state management
 * Recreate example project by Flutter 3.22
