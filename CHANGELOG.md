@@ -1,3 +1,14 @@
+## 7.0.1
+
+### Fixed
+
+* Replacing `carouselController` cleared a `CarouselControllerX` you own even when it had already been handed to another carousel, which then could not be driven by it.
+
+### Other
+
+* Fix outdated doc comments.
+* Record the removal of `CarouselOptions.copyWith` in the 5.0.0 entry.
+
 ## 7.0.0
 
 ### Breaking
