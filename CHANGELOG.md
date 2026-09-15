@@ -7,7 +7,7 @@
 ### Other
 
 * Fix outdated doc comments.
-* Record the removal of `CarouselOptions.copyWith` in the 5.0.0 entry.
+* Record the removal of `CarouselOptions.copyWith` in the 5.0.1 entry.
 
 ## 7.0.0
 
